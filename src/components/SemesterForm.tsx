@@ -1,0 +1,262 @@
+import { useState } from 'react';
+import {
+  Modal,
+  Portal,
+  TextInput,
+  Button,
+  Text,
+  SegmentedButtons,
+  HelperText,
+  useTheme,
+} from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
+import type { Semester, SectionTime } from '@/types';
+import { createDefaultSemester } from '@/types';
+import { computeSemesterEndDate } from '@/utils/scheduleDate';
+import { useSnackbar } from '@/hooks/useSnackbar';
+
+interface Props {
+  visible: boolean;
+  existing: Semester[];
+  editing?: Semester | null;
+  onDismiss: () => void;
+  onSave: (semester: Semester) => void;
+}
+
+const CAMPUS_PRESETS: Record<string, SectionTime[]> = {
+  长安校区: [
+    { start: '08:30', end: '09:15' },
+    { start: '09:25', end: '10:10' },
+    { start: '10:30', end: '11:15' },
+    { start: '11:25', end: '12:10' },
+    { start: '12:20', end: '13:05' },
+    { start: '13:05', end: '13:50' },
+    { start: '14:00', end: '14:45' },
+    { start: '14:55', end: '15:40' },
+    { start: '15:55', end: '16:40' },
+    { start: '16:55', end: '17:40' },
+    { start: '19:00', end: '19:45' },
+    { start: '19:55', end: '20:40' },
+    { start: '20:40', end: '21:25' },
+  ],
+  友谊校区夏季: [
+    { start: '08:30', end: '09:15' },
+    { start: '09:25', end: '10:10' },
+    { start: '10:30', end: '11:15' },
+    { start: '11:25', end: '12:10' },
+    { start: '12:20', end: '13:05' },
+    { start: '13:05', end: '13:50' },
+    { start: '14:30', end: '15:15' },
+    { start: '15:30', end: '16:15' },
+    { start: '16:30', end: '17:15' },
+    { start: '19:00', end: '19:45' },
+    { start: '19:55', end: '20:40' },
+    { start: '20:40', end: '21:25' },
+  ],
+  友谊校区冬季: [
+    { start: '08:30', end: '09:15' },
+    { start: '09:25', end: '10:10' },
+    { start: '10:30', end: '11:15' },
+    { start: '11:25', end: '12:10' },
+    { start: '12:20', end: '13:05' },
+    { start: '13:05', end: '13:50' },
+    { start: '14:00', end: '14:45' },
+    { start: '15:00', end: '15:45' },
+    { start: '16:00', end: '16:45' },
+    { start: '19:00', end: '19:45' },
+    { start: '19:55', end: '20:40' },
+    { start: '20:40', end: '21:25' },
+  ],
+};
+
+export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: Props) {
+  const theme = useTheme();
+  const showSnackbar = useSnackbar();
+  const [name, setName] = useState(editing?.name ?? '');
+  const [startDate, setStartDate] = useState(editing?.startDate ?? '');
+  const [weekCount, setWeekCount] = useState(String(editing?.weekCount ?? 20));
+  const [sectionCount, setSectionCount] = useState(String(editing?.sectionCount ?? 13));
+  const [sectionTimes, setSectionTimes] = useState<SectionTime[]>(
+    editing?.sectionTimes ?? createDefaultSemester().sectionTimes,
+  );
+  const [selectedPreset, setSelectedPreset] = useState('长安校区');
+
+  const endDate = startDate
+    ? computeSemesterEndDate(startDate, parseInt(weekCount, 10) || 0)
+    : '';
+
+  const handlePreset = (preset: string) => {
+    setSelectedPreset(preset);
+    setSectionTimes(CAMPUS_PRESETS[preset]);
+    setSectionCount(String(CAMPUS_PRESETS[preset].length));
+  };
+
+  const handleSectionCountChange = (value: string) => {
+    setSectionCount(value);
+    const n = parseInt(value, 10) || 0;
+    if (n > sectionTimes.length) {
+      const last = sectionTimes[sectionTimes.length - 1] ?? { start: '08:30', end: '09:15' };
+      const [lh, lm] = last.end.split(':').map(Number);
+      const cursor = (lh ?? 8) * 60 + (lm ?? 30) + 10;
+      const appended = [...sectionTimes];
+      for (let i = appended.length; i < n; i++) {
+        const start = cursor;
+        const end = start + 45;
+        appended.push({
+          start: formatTime(start),
+          end: formatTime(end),
+        });
+      }
+      setSectionTimes(appended);
+    } else if (n < sectionTimes.length) {
+      setSectionTimes(sectionTimes.slice(0, n));
+    }
+  };
+
+  const hasOverlap = (times: SectionTime[]): boolean => {
+    for (let i = 1; i < times.length; i++) {
+      if (times[i].start < times[i - 1].end) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const handleSave = () => {
+    const trimmed = name.trim();
+    const weeks = parseInt(weekCount, 10);
+    const sections = parseInt(sectionCount, 10);
+    if (!trimmed) {
+      return;
+    }
+    if (!startDate || Number.isNaN(weeks) || weeks <= 0 || Number.isNaN(sections) || sections <= 0) {
+      return;
+    }
+    if (hasOverlap(sectionTimes)) {
+      showSnackbar('课节时间存在重叠或倒置');
+      return;
+    }
+    const draft: Omit<Semester, 'id'> = {
+      name: trimmed,
+      startDate,
+      endDate,
+      weekCount: weeks,
+      sectionCount: sections,
+      sectionTimes,
+    };
+    const overlap = existing.some(
+      (s) =>
+        s.id !== editing?.id &&
+        s.startDate <= draft.endDate &&
+        draft.startDate <= s.endDate,
+    );
+    if (overlap) {
+      showSnackbar('该学期日期范围与已有学期重叠');
+      return;
+    }
+    onSave({
+      id: editing?.id ?? String(Date.now()),
+      ...draft,
+    });
+  };
+
+  return (
+    <Portal>
+      <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.surface }]}>
+        <Text variant="titleLarge" style={styles.title}>
+          {editing ? '编辑学期' : '新建学期'}
+        </Text>
+        <TextInput
+          label="学期名称"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+          placeholder="如 2025-2026春"
+        />
+        <TextInput
+          label="开始日期 (YYYY-MM-DD)"
+          value={startDate}
+          onChangeText={setStartDate}
+          style={styles.input}
+          placeholder="如 2025-02-24"
+        />
+        <View style={styles.row}>
+          <TextInput
+            label="周数"
+            value={weekCount}
+            onChangeText={setWeekCount}
+            style={styles.halfInput}
+            keyboardType="numeric"
+          />
+          <TextInput
+            label="每天节数"
+            value={sectionCount}
+            onChangeText={handleSectionCountChange}
+            style={styles.halfInput}
+            keyboardType="numeric"
+          />
+        </View>
+        {endDate ? <HelperText type="info">结束日期：{endDate}</HelperText> : null}
+        <Text variant="labelLarge" style={styles.label}>
+          课节时间预设
+        </Text>
+        <SegmentedButtons
+          value={selectedPreset}
+          onValueChange={handlePreset}
+          buttons={[
+            { value: '长安校区', label: '长安' },
+            { value: '友谊校区夏季', label: '友谊夏' },
+            { value: '友谊校区冬季', label: '友谊冬' },
+          ]}
+        />
+        <View style={styles.actions}>
+          <Button onPress={onDismiss}>取消</Button>
+          <Button mode="contained" onPress={handleSave}>
+            保存
+          </Button>
+        </View>
+      </Modal>
+    </Portal>
+  );
+}
+
+function formatTime(totalMinutes: number): string {
+  const h = Math.floor(totalMinutes / 60)
+    .toString()
+    .padStart(2, '0');
+  const m = (totalMinutes % 60).toString().padStart(2, '0');
+  return `${h}:${m}`;
+}
+
+const styles = StyleSheet.create({
+  modal: {
+    margin: 16,
+    padding: 16,
+    borderRadius: 12,
+  },
+  title: {
+    marginBottom: 12,
+    fontWeight: 'bold',
+  },
+  input: {
+    marginBottom: 8,
+  },
+  halfInput: {
+    flex: 1,
+    marginHorizontal: 4,
+  },
+  row: {
+    flexDirection: 'row',
+    marginHorizontal: -4,
+  },
+  label: {
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 16,
+    gap: 8,
+  },
+});
