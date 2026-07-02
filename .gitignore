@@ -43,3 +43,4 @@ yarn-error.*
 !.easignore
 
 .opencode/
+*.apk

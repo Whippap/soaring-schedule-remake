@@ -3,10 +3,11 @@ import { StyleSheet, View, ScrollView } from 'react-native';
 import { Button, Text, Chip, Switch, Modal, Portal, useTheme, Snackbar } from 'react-native-paper';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useCourseStore } from '@/stores/courseStore';
-import { enhanceExtractedData, convertToCourses, parseScheduleText } from '@/utils/jwxtParser';
+import { enhanceExtractedData, convertToCourses, parseScheduleText, computeMaxWeekAndSection, buildDefaultSectionTimes } from '@/utils/jwxtParser';
 import { formatTimeSlot } from '@/utils/scheduleDate';
 import { JwxtWebView } from './JwxtWebView';
 import type { ParsedData } from '@/utils/jwxtParser';
+import type { Semester } from '@/types';
 
 interface Props {
   visible: boolean;
@@ -18,6 +19,7 @@ type Step = 'webview' | 'select-semester';
 export function CourseImportWizard({ visible, onDismiss }: Props) {
   const theme = useTheme();
   const semesters = useSettingsStore((s) => s.semesters);
+  const addSemester = useSettingsStore((s) => s.addSemester);
   const addCourse = useCourseStore((s) => s.addCourse);
   const deleteCoursesBySemester = useCourseStore((s) => s.deleteCoursesBySemester);
 
@@ -55,6 +57,29 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
   const handleError = (message: string) => {
     setSnackbar(message);
   };
+
+  const handleAutoCreateSemester = useCallback(() => {
+    if (!parsedData) return;
+    const selectedSem = parsedData.semesters.find((s) => s.dataSemester === selectedDataSemester)
+      ?? parsedData.semesters[0];
+    const filtered = parsedData.courses.filter(
+      (c) => !selectedDataSemester || c.dataSemester === selectedDataSemester,
+    );
+    const { maxWeek, maxSection } = computeMaxWeekAndSection(filtered);
+    const times = buildDefaultSectionTimes(maxSection);
+    const newSemester: Semester = {
+      id: `auto-${Date.now()}`,
+      name: selectedSem.name,
+      startDate: '',
+      endDate: '',
+      weekCount: maxWeek,
+      sectionCount: maxSection,
+      sectionTimes: times,
+    };
+    addSemester(newSemester);
+    setSelectedSemesterId(newSemester.id);
+    setSnackbar(`已自动创建学期「${selectedSem.name}」(${maxWeek}周/${maxSection}节)`);
+  }, [parsedData, selectedDataSemester, addSemester]);
 
   const handleImport = () => {
     if (!parsedData || !selectedSemesterId) {
@@ -126,7 +151,16 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
               </Text>
               <View style={styles.chipRow}>
                 {semesters.length === 0 ? (
-                  <Text style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>暂无学期，请先在课表管理中创建</Text>
+                  <View style={styles.chipRow}>
+                    <Button
+                      mode="contained"
+                      icon="plus"
+                      compact
+                      onPress={handleAutoCreateSemester}
+                    >
+                      自动创建学期
+                    </Button>
+                  </View>
                 ) : (
                   semesters.map((sem) => (
                     <Chip

@@ -59,8 +59,12 @@
     },
     "extra": {
       "eas": {
-        "projectId": ""
-      }
+        "projectId": "fcb2c727-044c-4160-8c4e-dda34edf9a8e"
+      },
+      "router": {}
+    },
+    "ios": {
+      "bundleIdentifier": "com.nwpu.soaringschedule"
     }
   }
 }

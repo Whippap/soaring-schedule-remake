@@ -505,7 +505,28 @@ export function buildSemesterFromData(
   };
 }
 
-function buildDefaultSectionTimes(count: number): SectionTime[] {
+export function computeMaxWeekAndSection(
+  rawCourses: RawCourse[],
+): { maxWeek: number; maxSection: number } {
+  let maxWeek = 16;
+  let maxSection = 8;
+  for (const raw of rawCourses) {
+    const slots = parseScheduleText(raw.scheduleText);
+    for (const slot of slots) {
+      for (const part of slot.weekRange.split(',')) {
+        const trimmed = part.trim();
+        const dashIndex = trimmed.indexOf('-');
+        const n = dashIndex >= 0 ? parseInt(trimmed.slice(dashIndex + 1), 10) : parseInt(trimmed, 10);
+        if (!Number.isNaN(n) && n > maxWeek) maxWeek = n;
+      }
+      const slotMax = Math.max(...slot.classSections);
+      if (slotMax > maxSection) maxSection = slotMax;
+    }
+  }
+  return { maxWeek, maxSection };
+}
+
+export function buildDefaultSectionTimes(count: number): SectionTime[] {
   const times: SectionTime[] = [];
   let cursor = 8 * 60;
   for (let i = 0; i < count; i++) {
