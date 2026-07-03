@@ -108,6 +108,7 @@ export default function HomeScreen() {
       />
 
       <CourseForm
+        key={editingCourse?.id ?? 'new-course'}
         visible={courseFormVisible}
         semesters={effectiveSemesters}
         defaultSemesterId={currentSemester.id}

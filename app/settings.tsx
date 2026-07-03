@@ -69,7 +69,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScreenContainer>
+    <ScreenContainer scrollable>
       {/* Import Card */}
       <TouchableOpacity
         onPress={() => setImportVisible(true)}

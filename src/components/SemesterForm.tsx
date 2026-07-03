@@ -1,12 +1,8 @@
 import { useState } from 'react';
-import {
-  Modal,
-  Portal,
-  TextInput,
-  Text,
-  HelperText,
-} from 'react-native-paper';
-import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
+import { Platform, StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
+import { Modal, Portal, TextInput, Text, HelperText } from 'react-native-paper';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { format, parseISO, isValid } from 'date-fns';
 import type { Semester, SectionTime } from '@/types';
 import { createDefaultSemester } from '@/types';
 import { computeSemesterEndDate } from '@/utils/scheduleDate';
@@ -85,6 +81,22 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
     editing?.sectionTimes ?? createDefaultSemester().sectionTimes,
   );
   const [selectedPreset, setSelectedPreset] = useState('长安校区');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const parsedDate = (() => {
+    if (!startDate) return new Date();
+    const d = parseISO(startDate);
+    return isValid(d) ? d : new Date();
+  })();
+
+  const handleDateChange = (_: unknown, date?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    if (date) {
+      setStartDate(format(date, 'yyyy-MM-dd'));
+    }
+  };
 
   const endDate = startDate
     ? computeSemesterEndDate(startDate, parseInt(weekCount, 10) || 0)
@@ -185,13 +197,31 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
             style={styles.input}
             placeholder="如 2025-2026春"
           />
-          <TextInput
-            label="开始日期 (YYYY-MM-DD)"
-            value={startDate}
-            onChangeText={setStartDate}
-            style={styles.input}
-            placeholder="如 2025-02-24"
-          />
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={[
+              styles.dateInput,
+              {
+                borderColor: dt.colors.border,
+                borderRadius: dt.borderRadius.md,
+                backgroundColor: dt.colors.surface,
+              },
+            ]}
+            activeOpacity={0.7}
+          >
+            <Text style={{ fontSize: dt.fontSize.body, color: startDate ? dt.colors.text : dt.colors.textMuted }}>
+              {startDate || '选择开始日期'}
+            </Text>
+            <Icon name="calendar-month" size={20} color={dt.colors.textSecondary} />
+          </TouchableOpacity>
+          {showDatePicker ? (
+            <DateTimePicker
+              value={parsedDate}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={handleDateChange}
+            />
+          ) : null}
           <View style={styles.row}>
             <TextInput
               label="周数"
@@ -294,6 +324,11 @@ function formatTime(totalMinutes: number): string {
 const styles = StyleSheet.create({
   modal: { margin: 16, padding: 20, maxHeight: '85%' },
   input: { marginBottom: 8 },
+  dateInput: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 14, paddingVertical: 14, marginBottom: 8,
+    borderWidth: 1,
+  },
   halfInput: { flex: 1, marginHorizontal: 4 },
   row: { flexDirection: 'row', marginHorizontal: -4 },
   presetRow: { flexDirection: 'row', gap: 8 },

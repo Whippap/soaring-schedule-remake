@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -8,12 +8,14 @@ import {
   RefreshControl,
   Pressable,
   Alert,
+  PanResponder,
 } from 'react-native';
 import { Text } from 'react-native-paper';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  withSequence,
   runOnJS,
 } from 'react-native-reanimated';
 import { addDays, startOfWeek, format, isToday } from 'date-fns';
@@ -83,17 +85,17 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
 
   const goWeek = useCallback(
     (toValue: number) => {
-      'worklet';
       if (reduced) {
-        runOnJS(setWeekOffset)(toValue);
+        setWeekOffset(toValue);
         return;
       }
       // eslint-disable-next-line react-hooks/immutability
-      scale.value = withSpring(0.96, { damping: 15, stiffness: 200 }, () => {
+      scale.value = withSequence(
+        withSpring(0.96, { damping: 15, stiffness: 200 }),
          
-        scale.value = withSpring(1, { damping: 15, stiffness: 200 });
-      });
-      runOnJS(setWeekOffset)(toValue);
+        withSpring(1, { damping: 15, stiffness: 200 }),
+      );
+      setWeekOffset(toValue);
     },
     [scale, reduced],
   );
@@ -130,6 +132,28 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
     },
     [showSheet],
   );
+
+  const swipeThreshold = 60;
+  const weekOffsetRef = useRef(weekOffset);
+  const goWeekRef = useRef(goWeek);
+  useEffect(() => {
+    goWeekRef.current = goWeek;
+    weekOffsetRef.current = weekOffset;
+  });
+  const panResponder = useRef(
+    // eslint-disable-next-line react-hooks/refs
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gs) =>
+        Math.abs(gs.dx) > 20 && Math.abs(gs.dx) > Math.abs(gs.dy),
+      onPanResponderRelease: (_, gs) => {
+        if (gs.dx > swipeThreshold) {
+          goWeekRef.current(weekOffsetRef.current - 1);
+        } else if (gs.dx < -swipeThreshold) {
+          goWeekRef.current(weekOffsetRef.current + 1);
+        }
+      },
+    }),
+  ).current;
 
   const animatedGrid = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -224,7 +248,7 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
             {semester.name} · {weekLabel}
           </Text>
         </View>
-        <View style={styles.dayToggle}>
+        <View style={[styles.dayToggle, { backgroundColor: dt.colors.surfaceAlt }]}>
           <TouchableOpacity
             onPress={() => setDayMode(7)}
             style={[
@@ -267,7 +291,7 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={dt.colors.primary} />}
       >
         {/* Day Headers */}
-        <View style={[styles.dayHeaderRow, { borderBottomColor: dt.colors.border }]}>
+        <View style={[styles.dayHeaderRow, { borderBottomColor: dt.colors.border, backgroundColor: dt.colors.bg }]}>
           <View style={{ width: TIME_COLUMN_WIDTH }} />
           {days.map((date) => {
             const today = isToday(date);
@@ -306,7 +330,8 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
         </View>
 
         {/* Grid Body */}
-        <Animated.View style={[styles.gridBody, animatedGrid]}>
+        {/* eslint-disable-next-line react-hooks/refs */}
+        <Animated.View style={[styles.gridBody, animatedGrid]} {...panResponder.panHandlers}>
           {/* Time Column */}
           <View style={{ width: TIME_COLUMN_WIDTH }}>
             {Array.from({ length: semester.sectionCount }, (_, i) => i + 1).map((sec) => (
@@ -572,7 +597,6 @@ const styles = StyleSheet.create({
   headerLeft: { flexDirection: 'column' },
   dayToggle: {
     flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
     borderRadius: 10,
     padding: 2,
   },
@@ -589,7 +613,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: StyleSheet.hairlineWidth,
     paddingVertical: 6,
-    backgroundColor: '#FAFBFC',
   },
   dayHeader: { alignItems: 'center', paddingVertical: 4 },
   todayPill: {

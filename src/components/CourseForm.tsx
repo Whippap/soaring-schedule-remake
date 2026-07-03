@@ -68,6 +68,11 @@ export function CourseForm({
 }: Props) {
   const dt = useDesignTokens();
   const showSnackbar = useSnackbar();
+
+  function emptySlot(): TimeSlot {
+    return { weekRange: '1-16', repeatRule: RepeatRule.ALL, dayOfWeek: 1, classSections: [1, 2] };
+  }
+
   const [name, setName] = useState(editing?.name ?? '');
   const [semesterId, setSemesterId] = useState(editing?.semesterId ?? defaultSemesterId);
   const [code, setCode] = useState(editing?.code ?? '');
@@ -87,10 +92,6 @@ export function CourseForm({
   const selectedSemester = semesters.find((s) => s.id === semesterId);
   const maxWeek = selectedSemester?.weekCount ?? 20;
   const maxSection = selectedSemester?.sectionCount ?? 13;
-
-  function emptySlot(): TimeSlot {
-    return { weekRange: '1-16', repeatRule: RepeatRule.ALL, dayOfWeek: 1, classSections: [1, 2] };
-  }
 
   const updateSlot = (index: number, updates: Partial<TimeSlot>) => {
     setTimeSlots((slots) =>

@@ -4,20 +4,20 @@
     "slug": "soaring-schedule",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/icon/android/play_store_512.png",
     "scheme": "soaringschedule",
     "userInterfaceStyle": "automatic",
     "android": {
       "package": "com.nwpu.soaringschedule",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/icon/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+        "backgroundColor": "#0D9488",
+        "monochromeImage": "./assets/icon/android/res/mipmap-xxxhdpi/ic_launcher_monochrome.png"
       }
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/icon/web/favicon.ico"
     },
     "plugins": [
       "expo-router",

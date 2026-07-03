@@ -14,6 +14,7 @@ export default function RootLayout() {
   const screenOptions = useMemo(() => {
     const c = darkMode ? darkColors : lightColors;
     return {
+      headerShown: false,
       headerTitleStyle: {
         fontWeight: fontWeight.heading as '800',
         fontSize: fontSize.subheading,

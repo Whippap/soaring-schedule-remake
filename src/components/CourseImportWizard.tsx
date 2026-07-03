@@ -7,6 +7,7 @@ import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { enhanceExtractedData, convertToCourses, parseScheduleText, computeMaxWeekAndSection, buildDefaultSectionTimes } from '@/utils/jwxtParser';
 import { formatTimeSlot, toISODate, computeSemesterEndDate } from '@/utils/scheduleDate';
 import { JwxtWebView } from './JwxtWebView';
+import { SemesterForm } from './SemesterForm';
 import type { ParsedData } from '@/utils/jwxtParser';
 import type { Semester } from '@/types';
 
@@ -31,6 +32,8 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
   const [overwriteExisting, setOverwriteExisting] = useState(false);
   const [importing, setImporting] = useState(false);
   const [snackbar, setSnackbar] = useState<string | null>(null);
+  const [showSemesterForm, setShowSemesterForm] = useState(false);
+  const [draftSemester, setDraftSemester] = useState<Semester | null>(null);
 
   const reset = useCallback(() => {
     setStep('webview');
@@ -70,7 +73,7 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
     const times = buildDefaultSectionTimes(maxSection);
     const today = toISODate(new Date());
     const endDate = computeSemesterEndDate(today, maxWeek);
-    const newSemester: Semester = {
+    const draft: Semester = {
       id: `auto-${Date.now()}`,
       name: selectedSem.name,
       startDate: today,
@@ -79,10 +82,17 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
       sectionCount: maxSection,
       sectionTimes: times,
     };
-    addSemester(newSemester);
-    setSelectedSemesterId(newSemester.id);
-    setSnackbar(`已自动创建学期「${selectedSem.name}」(${maxWeek}周/${maxSection}节)`);
-  }, [parsedData, selectedDataSemester, addSemester]);
+    setDraftSemester(draft);
+    setShowSemesterForm(true);
+  }, [parsedData, selectedDataSemester]);
+
+  const handleSemesterSaved = (s: Semester) => {
+    addSemester(s);
+    setSelectedSemesterId(s.id);
+    setShowSemesterForm(false);
+    setDraftSemester(null);
+    setSnackbar(`已创建学期「${s.name}」`);
+  };
 
   const handleImport = () => {
     if (!parsedData || !selectedSemesterId) {
@@ -153,29 +163,37 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
                 选择目标学期
               </Text>
               <View style={styles.chipRow}>
+                {semesters.map((sem) => (
+                  <Chip
+                    key={sem.id}
+                    selected={selectedSemesterId === sem.id}
+                    onPress={() => setSelectedSemesterId(sem.id)}
+                    style={styles.chip}
+                  >
+                    {sem.name}
+                  </Chip>
+                ))}
+                <Button
+                  mode="outlined"
+                  icon="plus"
+                  compact
+                  onPress={() => {
+                    setDraftSemester(null);
+                    setShowSemesterForm(true);
+                  }}
+                >
+                  手动创建学期
+                </Button>
                 {semesters.length === 0 ? (
-                  <View style={styles.chipRow}>
-                    <Button
-                      mode="contained"
-                      icon="plus"
-                      compact
-                      onPress={handleAutoCreateSemester}
-                    >
-                      自动创建学期
-                    </Button>
-                  </View>
-                ) : (
-                  semesters.map((sem) => (
-                    <Chip
-                      key={sem.id}
-                      selected={selectedSemesterId === sem.id}
-                      onPress={() => setSelectedSemesterId(sem.id)}
-                      style={styles.chip}
-                    >
-                      {sem.name}
-                    </Chip>
-                  ))
-                )}
+                  <Button
+                    mode="contained"
+                    icon="plus"
+                    compact
+                    onPress={handleAutoCreateSemester}
+                  >
+                    自动创建学期
+                  </Button>
+                ) : null}
               </View>
 
               {selectedSemesterId ? (
@@ -221,6 +239,17 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
           )}
         </View>
       </Modal>
+      <SemesterForm
+        key={draftSemester?.id ?? 'new'}
+        visible={showSemesterForm}
+        existing={semesters}
+        editing={draftSemester}
+        onDismiss={() => {
+          setShowSemesterForm(false);
+          setDraftSemester(null);
+        }}
+        onSave={handleSemesterSaved}
+      />
       <Snackbar visible={snackbar !== null} onDismiss={() => setSnackbar(null)} duration={3000}>
         {snackbar}
       </Snackbar>

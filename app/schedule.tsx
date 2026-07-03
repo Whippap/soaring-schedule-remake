@@ -103,6 +103,7 @@ export default function ScheduleScreen() {
       )}
 
       <SemesterForm
+        key={editingSemester?.id ?? 'new-semester'}
         visible={semesterFormVisible}
         existing={semesters}
         editing={editingSemester}
@@ -110,6 +111,7 @@ export default function ScheduleScreen() {
         onSave={handleSaveSemester}
       />
       <CourseForm
+        key={editingCourse?.id ?? 'new-course'}
         visible={courseFormVisible}
         semesters={effectiveSemesters}
         defaultSemesterId={currentSemester.id}
@@ -132,22 +134,25 @@ interface SemesterListProps {
 function SemesterList({ semesters, currentId, onEdit, onDelete, dt }: SemesterListProps) {
   return (
     <View style={styles.semesterList}>
-      {semesters.map((s) => (
+      {semesters.map((s) => {
+        const isDefault = s.id === 'default';
+        return (
         <View
           key={s.id}
           style={[
             styles.semesterCard,
             {
-              borderColor: s.id === currentId ? dt.colors.primary : dt.colors.border,
-              borderWidth: s.id === currentId ? 1.5 : 1,
+              borderColor: s.id === currentId && !isDefault ? dt.colors.primary : dt.colors.border,
+              borderWidth: s.id === currentId && !isDefault ? 1.5 : 1,
               backgroundColor: dt.colors.surface,
               borderRadius: dt.borderRadius.lg,
+              opacity: isDefault ? 0.5 : 1,
             },
           ]}
         >
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Text style={{ fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading, color: dt.colors.text }}>
+              <Text style={{ fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading, color: isDefault ? dt.colors.textMuted : dt.colors.text }}>
                 {s.name}
               </Text>
               {s.id === currentId ? (
@@ -155,11 +160,17 @@ function SemesterList({ semesters, currentId, onEdit, onDelete, dt }: SemesterLi
                   <Text style={{ fontSize: 10, fontWeight: '600', color: dt.colors.onPrimary }}>当前</Text>
                 </View>
               ) : null}
+              {isDefault ? (
+                <View style={{ backgroundColor: dt.colors.surfaceAlt, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 }}>
+                  <Text style={{ fontSize: 10, color: dt.colors.textMuted }}>默认</Text>
+                </View>
+              ) : null}
             </View>
-            <Text style={{ fontSize: dt.fontSize.caption, color: dt.colors.textSecondary, marginTop: 4 }}>
+            <Text style={{ fontSize: dt.fontSize.caption, color: isDefault ? dt.colors.textMuted : dt.colors.textSecondary, marginTop: 4 }}>
               {s.startDate} ~ {s.endDate} · {s.weekCount}周 · {s.sectionCount}节/天
             </Text>
           </View>
+          {!isDefault ? (
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <Text
               style={{ fontSize: dt.fontSize.caption, color: dt.colors.primary, fontWeight: dt.fontWeight.subheading }}
@@ -174,8 +185,10 @@ function SemesterList({ semesters, currentId, onEdit, onDelete, dt }: SemesterLi
               删除
             </Text>
           </View>
+          ) : null}
         </View>
-      ))}
+        );
+      })}
     </View>
   );
 }

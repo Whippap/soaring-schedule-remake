@@ -148,7 +148,7 @@ function AnimatedCard({
                 <View style={[styles.metaPill, { backgroundColor: dt.colors.surfaceAlt }]}>
                   <Icon name="location" size={11} color={dt.colors.textSecondary} />
                   <Text style={[styles.metaText, { color: dt.colors.textSecondary }]}>
-                    {course.location}
+                    {course.location.length > 20 ? course.location.slice(0, 20) + '...' : course.location}
                   </Text>
                 </View>
               ) : null}
