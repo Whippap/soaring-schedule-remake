@@ -3,17 +3,16 @@ import {
   Modal,
   Portal,
   TextInput,
-  Button,
   Text,
-  SegmentedButtons,
   HelperText,
-  useTheme,
 } from 'react-native-paper';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import type { Semester, SectionTime } from '@/types';
 import { createDefaultSemester } from '@/types';
 import { computeSemesterEndDate } from '@/utils/scheduleDate';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { useDesignTokens } from '@/hooks/useDesignTokens';
+import { Icon } from '@/components/Icon';
 
 interface Props {
   visible: boolean;
@@ -69,8 +68,14 @@ const CAMPUS_PRESETS: Record<string, SectionTime[]> = {
   ],
 };
 
+const PRESET_LABELS = [
+  { value: '长安校区', label: '长安' },
+  { value: '友谊校区夏季', label: '友谊夏' },
+  { value: '友谊校区冬季', label: '友谊冬' },
+];
+
 export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: Props) {
-  const theme = useTheme();
+  const dt = useDesignTokens();
   const showSnackbar = useSnackbar();
   const [name, setName] = useState(editing?.name ?? '');
   const [startDate, setStartDate] = useState(editing?.startDate ?? '');
@@ -102,10 +107,7 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
       for (let i = appended.length; i < n; i++) {
         const start = cursor;
         const end = start + 45;
-        appended.push({
-          start: formatTime(start),
-          end: formatTime(end),
-        });
+        appended.push({ start: formatTime(start), end: formatTime(end) });
       }
       setSectionTimes(appended);
     } else if (n < sectionTimes.length) {
@@ -115,9 +117,7 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
 
   const hasOverlap = (times: SectionTime[]): boolean => {
     for (let i = 1; i < times.length; i++) {
-      if (times[i].start < times[i - 1].end) {
-        return true;
-      }
+      if (times[i].start < times[i - 1].end) return true;
     }
     return false;
   };
@@ -126,12 +126,8 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
     const trimmed = name.trim();
     const weeks = parseInt(weekCount, 10);
     const sections = parseInt(sectionCount, 10);
-    if (!trimmed) {
-      return;
-    }
-    if (!startDate || Number.isNaN(weeks) || weeks <= 0 || Number.isNaN(sections) || sections <= 0) {
-      return;
-    }
+    if (!trimmed) return;
+    if (!startDate || Number.isNaN(weeks) || weeks <= 0 || Number.isNaN(sections) || sections <= 0) return;
     if (hasOverlap(sectionTimes)) {
       showSnackbar('课节时间存在重叠或倒置');
       return;
@@ -154,109 +150,153 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
       showSnackbar('该学期日期范围与已有学期重叠');
       return;
     }
-    onSave({
-      id: editing?.id ?? String(Date.now()),
-      ...draft,
-    });
+    onSave({ id: editing?.id ?? String(Date.now()), ...draft });
   };
 
   return (
     <Portal>
-      <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.surface }]}>
-        <Text variant="titleLarge" style={styles.title}>
-          {editing ? '编辑学期' : '新建学期'}
-        </Text>
-        <TextInput
-          label="学期名称"
-          value={name}
-          onChangeText={setName}
-          style={styles.input}
-          placeholder="如 2025-2026春"
-        />
-        <TextInput
-          label="开始日期 (YYYY-MM-DD)"
-          value={startDate}
-          onChangeText={setStartDate}
-          style={styles.input}
-          placeholder="如 2025-02-24"
-        />
-        <View style={styles.row}>
+      <Modal
+        visible={visible}
+        onDismiss={onDismiss}
+        contentContainerStyle={[
+          styles.modal,
+          {
+            backgroundColor: dt.colors.surface,
+            borderRadius: dt.borderRadius.xl,
+          },
+        ]}
+      >
+        <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+          <Text
+            style={{
+              fontSize: dt.fontSize.subheading,
+              fontWeight: dt.fontWeight.subheading,
+              color: dt.colors.text,
+              marginBottom: dt.spacing.md,
+            }}
+          >
+            {editing ? '编辑学期' : '新建学期'}
+          </Text>
+
           <TextInput
-            label="周数"
-            value={weekCount}
-            onChangeText={setWeekCount}
-            style={styles.halfInput}
-            keyboardType="numeric"
+            label="学期名称"
+            value={name}
+            onChangeText={setName}
+            style={styles.input}
+            placeholder="如 2025-2026春"
           />
           <TextInput
-            label="每天节数"
-            value={sectionCount}
-            onChangeText={handleSectionCountChange}
-            style={styles.halfInput}
-            keyboardType="numeric"
+            label="开始日期 (YYYY-MM-DD)"
+            value={startDate}
+            onChangeText={setStartDate}
+            style={styles.input}
+            placeholder="如 2025-02-24"
           />
-        </View>
-        {endDate ? <HelperText type="info">结束日期：{endDate}</HelperText> : null}
-        <Text variant="labelLarge" style={styles.label}>
-          课节时间预设
-        </Text>
-        <SegmentedButtons
-          value={selectedPreset}
-          onValueChange={handlePreset}
-          buttons={[
-            { value: '长安校区', label: '长安' },
-            { value: '友谊校区夏季', label: '友谊夏' },
-            { value: '友谊校区冬季', label: '友谊冬' },
-          ]}
-        />
-        <View style={styles.actions}>
-          <Button onPress={onDismiss}>取消</Button>
-          <Button mode="contained" onPress={handleSave}>
-            保存
-          </Button>
-        </View>
+          <View style={styles.row}>
+            <TextInput
+              label="周数"
+              value={weekCount}
+              onChangeText={setWeekCount}
+              style={styles.halfInput}
+              keyboardType="numeric"
+            />
+            <TextInput
+              label="每天节数"
+              value={sectionCount}
+              onChangeText={handleSectionCountChange}
+              style={styles.halfInput}
+              keyboardType="numeric"
+            />
+          </View>
+          {endDate ? (
+            <HelperText type="info" style={{ color: dt.colors.textSecondary }}>
+              结束日期：{endDate}
+            </HelperText>
+          ) : null}
+
+          <Text
+            style={{
+              fontSize: dt.fontSize.caption,
+              fontWeight: dt.fontWeight.subheading,
+              color: dt.colors.text,
+              marginTop: dt.spacing.md,
+              marginBottom: dt.spacing.sm,
+            }}
+          >
+            课节时间预设
+          </Text>
+          <View style={styles.presetRow}>
+            {PRESET_LABELS.map((p) => (
+              <TouchableOpacity
+                key={p.value}
+                onPress={() => handlePreset(p.value)}
+                style={[
+                  styles.presetBtn,
+                  {
+                    borderRadius: dt.borderRadius.md,
+                    borderColor: selectedPreset === p.value ? dt.colors.primary : dt.colors.border,
+                    backgroundColor: selectedPreset === p.value ? `${dt.colors.primary}14` : dt.colors.surfaceAlt,
+                  },
+                ]}
+              >
+                <Icon
+                  name={selectedPreset === p.value ? 'check' : 'course'}
+                  size={14}
+                  color={selectedPreset === p.value ? dt.colors.primary : dt.colors.textMuted}
+                />
+                <Text
+                  style={{
+                    fontSize: dt.fontSize.caption,
+                    fontWeight: selectedPreset === p.value ? dt.fontWeight.subheading : dt.fontWeight.body,
+                    color: selectedPreset === p.value ? dt.colors.primary : dt.colors.textSecondary,
+                    marginLeft: 4,
+                  }}
+                >
+                  {p.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={[styles.actions, { marginTop: dt.spacing.xl }]}>
+            <TouchableOpacity
+              onPress={onDismiss}
+              style={{ paddingHorizontal: 16, paddingVertical: 10 }}
+            >
+              <Text style={{ color: dt.colors.textSecondary, fontSize: dt.fontSize.body }}>取消</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleSave}
+              style={{
+                paddingHorizontal: 24,
+                paddingVertical: 10,
+                backgroundColor: dt.colors.primary,
+                borderRadius: dt.borderRadius.md,
+              }}
+            >
+              <Text style={{ color: dt.colors.onPrimary, fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading }}>
+                保存
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </Modal>
     </Portal>
   );
 }
 
 function formatTime(totalMinutes: number): string {
-  const h = Math.floor(totalMinutes / 60)
-    .toString()
-    .padStart(2, '0');
+  const h = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
   const m = (totalMinutes % 60).toString().padStart(2, '0');
   return `${h}:${m}`;
 }
 
 const styles = StyleSheet.create({
-  modal: {
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
-  },
-  title: {
-    marginBottom: 12,
-    fontWeight: 'bold',
-  },
-  input: {
-    marginBottom: 8,
-  },
-  halfInput: {
-    flex: 1,
-    marginHorizontal: 4,
-  },
-  row: {
-    flexDirection: 'row',
-    marginHorizontal: -4,
-  },
-  label: {
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 16,
-    gap: 8,
-  },
+  modal: { margin: 16, padding: 20, maxHeight: '85%' },
+  input: { marginBottom: 8 },
+  halfInput: { flex: 1, marginHorizontal: 4 },
+  row: { flexDirection: 'row', marginHorizontal: -4 },
+  presetRow: { flexDirection: 'row', gap: 8 },
+  presetBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1.5 },
+  actions: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 4 },
 });

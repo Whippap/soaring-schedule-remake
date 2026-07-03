@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { FAB, useTheme } from 'react-native-paper';
-import { StyleSheet, View } from 'react-native';
+import { FAB, Text } from 'react-native-paper';
+import { View, TouchableOpacity } from 'react-native';
 import type { Course } from '@/types';
 import { createDefaultSemester } from '@/types';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -9,9 +9,11 @@ import { findSemesterForDate } from '@/utils/scheduleDate';
 import { CourseSchedule } from '@/components/CourseSchedule';
 import { CalendarView } from '@/components/CalendarView';
 import { CourseForm } from '@/components/CourseForm';
+import { ScreenContainer } from '@/components/ScreenContainer';
+import { useDesignTokens } from '@/hooks/useDesignTokens';
 
 export default function HomeScreen() {
-  const theme = useTheme();
+  const dt = useDesignTokens();
   const semesters = useSettingsStore((s) => s.semesters);
   const courses = useCourseStore((s) => s.courses);
   const [view, setView] = useState<'schedule' | 'calendar'>('schedule');
@@ -22,7 +24,7 @@ export default function HomeScreen() {
   const currentSemester = findSemesterForDate(new Date(), semesters);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <ScreenContainer padded={false}>
       {view === 'schedule' ? (
         <CourseSchedule
           semesters={effectiveSemesters}
@@ -34,22 +36,77 @@ export default function HomeScreen() {
       ) : (
         <CalendarView courses={courses} semesters={effectiveSemesters} />
       )}
-      <View style={styles.viewToggle}>
-        <FAB
-          icon={view === 'schedule' ? 'calendar-month' : 'view-week'}
-          size="small"
-          style={styles.toggleFab}
-          onPress={() => setView(view === 'schedule' ? 'calendar' : 'schedule')}
-        />
+
+      {/* View Toggle */}
+      <View style={{
+        position: 'absolute',
+        bottom: 16,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        pointerEvents: 'box-none',
+      }}>
+        <View style={{
+          flexDirection: 'row',
+          backgroundColor: dt.colors.surface,
+          borderRadius: dt.borderRadius.pill,
+          borderWidth: 1,
+          borderColor: dt.colors.border,
+          padding: 3,
+        }}>
+          <TouchableOpacity
+            onPress={() => setView('schedule')}
+            style={{
+              paddingHorizontal: 20,
+              paddingVertical: 8,
+              borderRadius: dt.borderRadius.pill,
+              backgroundColor: view === 'schedule' ? dt.colors.primary : 'transparent',
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={{
+              fontSize: dt.fontSize.caption,
+              fontWeight: dt.fontWeight.subheading,
+              color: view === 'schedule' ? dt.colors.onPrimary : dt.colors.textSecondary,
+            }}>
+              周视图
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setView('calendar')}
+            style={{
+              paddingHorizontal: 20,
+              paddingVertical: 8,
+              borderRadius: dt.borderRadius.pill,
+              backgroundColor: view === 'calendar' ? dt.colors.primary : 'transparent',
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={{
+              fontSize: dt.fontSize.caption,
+              fontWeight: dt.fontWeight.subheading,
+              color: view === 'calendar' ? dt.colors.onPrimary : dt.colors.textSecondary,
+            }}>
+              月视图
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
+
+      {/* + FAB — offset to accommodate bottom bar + view toggle */}
       <FAB
         icon="plus"
-        style={styles.fab}
+        style={{
+          position: 'absolute',
+          right: 16,
+          bottom: 80,
+        }}
         onPress={() => {
           setEditingCourse(null);
           setCourseFormVisible(true);
         }}
       />
+
       <CourseForm
         visible={courseFormVisible}
         semesters={effectiveSemesters}
@@ -58,25 +115,6 @@ export default function HomeScreen() {
         onDismiss={() => setCourseFormVisible(false)}
         onSaved={() => setCourseFormVisible(false)}
       />
-    </View>
+    </ScreenContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  viewToggle: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-  },
-  toggleFab: {
-    backgroundColor: '#3498db',
-  },
-  fab: {
-    position: 'absolute',
-    right: 16,
-    bottom: 16,
-  },
-});

@@ -1,5 +1,6 @@
 import { FlexWidget, TextWidget } from 'react-native-android-widget';
 import type { WidgetDataSnapshot } from '@/utils/widgetData';
+import { lightColors, darkColors, courseColors } from '@/design';
 
 interface Props {
   snapshot: WidgetDataSnapshot;
@@ -7,9 +8,10 @@ interface Props {
 }
 
 export function CourseWidget({ snapshot, isDark }: Props) {
-  const bgColor = isDark ? '#1a1a1a' : '#ffffff';
-  const textColor = isDark ? '#ffffff' : '#333333';
-  const subColor = isDark ? '#bbbbbb' : '#888888';
+  const c = isDark ? darkColors : lightColors;
+  const bgColor = c.bg;
+  const textColor = c.text;
+  const subColor = c.textSecondary;
 
   return (
     <FlexWidget
@@ -17,8 +19,8 @@ export function CourseWidget({ snapshot, isDark }: Props) {
         width: 280,
         height: 180,
         backgroundColor: bgColor,
-        borderRadius: 12,
-        padding: 12,
+        borderRadius: 16,
+        padding: 14,
         flexDirection: 'column',
       }}
     >
@@ -33,14 +35,14 @@ export function CourseWidget({ snapshot, isDark }: Props) {
         <FlexWidget style={{ flex: 1, flexDirection: 'column', flexGap: 8 }}>
           {snapshot.items.map((item) => (
             <FlexWidget key={item.id} style={{ flexDirection: 'row', flexGap: 8, alignItems: 'center' }}>
-                <FlexWidget
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: 5,
-                    backgroundColor: (item.color ?? '#3498db') as `#${string}`,
-                  }}
-                />
+              <FlexWidget
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: (item.color ?? courseColors[0]) as `#${string}`,
+                }}
+              />
               <FlexWidget style={{ flex: 1, flexDirection: 'column' }}>
                 <TextWidget
                   text={item.name}

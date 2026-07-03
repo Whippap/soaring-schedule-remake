@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import { Button, Text, Chip, Switch, Modal, Portal, useTheme, Snackbar } from 'react-native-paper';
+import { Button, Text, Chip, Switch, Modal, Portal, Snackbar } from 'react-native-paper';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useCourseStore } from '@/stores/courseStore';
+import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { enhanceExtractedData, convertToCourses, parseScheduleText, computeMaxWeekAndSection, buildDefaultSectionTimes } from '@/utils/jwxtParser';
 import { formatTimeSlot, toISODate, computeSemesterEndDate } from '@/utils/scheduleDate';
 import { JwxtWebView } from './JwxtWebView';
@@ -17,7 +18,7 @@ interface Props {
 type Step = 'webview' | 'select-semester';
 
 export function CourseImportWizard({ visible, onDismiss }: Props) {
-  const theme = useTheme();
+  const dt = useDesignTokens();
   const semesters = useSettingsStore((s) => s.semesters);
   const addSemester = useSettingsStore((s) => s.addSemester);
   const addCourse = useCourseStore((s) => s.addCourse);
@@ -122,8 +123,8 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
   return (
     <Portal>
       <Modal visible={visible} onDismiss={handleDismiss} contentContainerStyle={styles.modal}>
-        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-          <View style={[styles.header, { borderBottomColor: theme.colors.outline }]}>
+        <View style={[styles.container, { backgroundColor: dt.colors.bg }]}>
+          <View style={[styles.header, { borderBottomColor: dt.colors.border }]}>
             <Text variant="titleLarge">{step === 'webview' ? '导入课表 - 登录教务系统' : '导入课表 - 选择学期'}</Text>
             <Button onPress={handleDismiss}>取消</Button>
           </View>
@@ -191,17 +192,16 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
                 预览（{filteredPreview.length} 门）
               </Text>
               {filteredPreview.slice(0, 5).map((c, i) => (
-                <View key={i} style={[styles.previewItem, { borderBottomColor: theme.colors.surfaceVariant }]}>
-                  <Text style={[styles.previewName, { color: theme.colors.onSurface }]}>{c.name}</Text>
+                <View key={i} style={[styles.previewItem, { borderBottomColor: dt.colors.surfaceAlt }]}>
+                  <Text style={[styles.previewName, { color: dt.colors.text }]}>{c.name}</Text>
                   {c.scheduleText ? (
-                    <Text style={[styles.previewSlot, { color: theme.colors.onSurfaceVariant }]} numberOfLines={1}>
-                      {formatTimeSlot(parseScheduleText(c.scheduleText)[0])}
+                    <Text style={[styles.previewSlot, { color: dt.colors.textSecondary }]} numberOfLines={1}>                      {formatTimeSlot(parseScheduleText(c.scheduleText)[0])}
                     </Text>
                   ) : null}
                 </View>
               ))}
               {filteredPreview.length > 5 ? (
-                <Text style={[styles.moreText, { color: theme.colors.onSurfaceVariant }]}>...还有 {filteredPreview.length - 5} 门课程</Text>
+                <Text style={[styles.moreText, { color: dt.colors.textSecondary }]}>...还有 {filteredPreview.length - 5} 门课程</Text>
               ) : null}
 
               <View style={styles.actions}>

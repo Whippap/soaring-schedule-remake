@@ -46,31 +46,9 @@ export interface Semester {
   sectionTimes: SectionTime[];
 }
 
-export const PRESET_COLORS = [
-  '#3498db',
-  '#2ecc71',
-  '#e74c3c',
-  '#f39c12',
-  '#9b59b6',
-  '#1abc9c',
-  '#e67e22',
-  '#34495e',
-];
+export { courseColors as PRESET_COLORS, importColors as IMPORT_COLORS } from '@/design';
 
-export const IMPORT_COLORS = [
-  '#3498db',
-  '#2ecc71',
-  '#e74c3c',
-  '#f39c12',
-  '#9b59b6',
-  '#1abc9c',
-  '#e67e22',
-  '#34495e',
-  '#16a085',
-  '#27ae60',
-];
-
-export const DEFAULT_THEME_COLOR = '#3498db';
+export const DEFAULT_THEME_COLOR = '#0D9488';
 
 function formatTime(totalMinutes: number): string {
   const h = Math.floor(totalMinutes / 60)

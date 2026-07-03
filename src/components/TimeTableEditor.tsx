@@ -8,9 +8,9 @@ import {
   Text,
   SegmentedButtons,
   Switch,
-  useTheme,
 } from 'react-native-paper';
 import type { SectionTime } from '@/types';
+import { useDesignTokens } from '@/hooks/useDesignTokens';
 
 interface Props {
   visible: boolean;
@@ -68,7 +68,7 @@ const CAMPUS_PRESETS: Record<string, SectionTime[]> = {
 const SECTION_DURATION = 45;
 
 export function TimeTableEditor({ visible, sectionTimes, onDismiss, onSave }: Props) {
-  const theme = useTheme();
+  const dt = useDesignTokens();
   const [times, setTimes] = useState<SectionTime[]>(sectionTimes);
   const [uniform, setUniform] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState('长安校区');
@@ -110,7 +110,7 @@ export function TimeTableEditor({ visible, sectionTimes, onDismiss, onSave }: Pr
   return (
     <Portal>
       <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modal}>
-        <View style={{ backgroundColor: theme.colors.surface }}>
+        <View style={{ backgroundColor: dt.colors.surface }}>
           <Text variant="titleLarge" style={styles.title}>
             课节时间表
           </Text>

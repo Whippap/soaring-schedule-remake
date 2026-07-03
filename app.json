@@ -51,7 +51,8 @@
           ]
         }
       ],
-      "./plugins/withHonorWidget.js"
+      "./plugins/withHonorWidget.js",
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,

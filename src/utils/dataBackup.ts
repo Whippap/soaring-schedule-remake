@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Sharing from 'expo-sharing';
 import { File, Paths } from 'expo-file-system';
 import type { Course, Semester } from '@/types';
+import { DEFAULT_THEME_COLOR } from '@/types';
 
 const COURSES_KEY = 'soaring-schedule-courses';
 const SETTINGS_KEY = 'soaring-schedule-settings';
@@ -24,7 +25,7 @@ export async function buildBackupData(): Promise<BackupData | null> {
   const courses = coursesRaw ? JSON.parse(coursesRaw)?.state?.courses ?? JSON.parse(coursesRaw)?.courses ?? [] : [];
   const settingsParsed = settingsRaw
     ? JSON.parse(settingsRaw)?.state ?? JSON.parse(settingsRaw) ?? {}
-    : { semesters: [], themeColor: '#3498db', darkMode: false };
+    : { semesters: [], themeColor: DEFAULT_THEME_COLOR, darkMode: false };
 
   if (courses.length === 0 && (settingsParsed.semesters?.length ?? 0) === 0) {
     return null;
@@ -36,7 +37,7 @@ export async function buildBackupData(): Promise<BackupData | null> {
     courses,
     settings: {
       semesters: settingsParsed.semesters ?? [],
-      themeColor: settingsParsed.themeColor ?? '#3498db',
+      themeColor: settingsParsed.themeColor ?? DEFAULT_THEME_COLOR,
       darkMode: settingsParsed.darkMode ?? false,
     },
   };

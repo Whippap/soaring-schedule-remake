@@ -1,72 +1,61 @@
+import { useMemo } from 'react';
 import { Tabs } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { PaperProvider, MD3DarkTheme, MD3LightTheme, adaptNavigationTheme, Snackbar } from 'react-native-paper';
-import {
-  DarkTheme as NavigationDarkTheme,
-  DefaultTheme as NavigationDefaultTheme,
-} from '@react-navigation/native';
-import { StatusBar } from 'expo-status-bar';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useWidgetDataSync } from '@/hooks/useWidgetDataSync';
-import { useSnackbarStore } from '@/hooks/useSnackbar';
-
-const { LightTheme, DarkTheme } = adaptNavigationTheme({
-  reactNavigationLight: NavigationDefaultTheme,
-  reactNavigationDark: NavigationDarkTheme,
-});
+import { ThemeProvider } from '@/components/ThemeProvider';
+import { Icon } from '@/components/Icon';
+import { darkColors, lightColors, fontWeight, fontSize } from '@/design';
 
 export default function RootLayout() {
   const darkMode = useSettingsStore((s) => s.darkMode);
   const themeColor = useSettingsStore((s) => s.themeColor);
-  const snackbarMessage = useSnackbarStore((s) => s.message);
-  const dismissSnackbar = useSnackbarStore((s) => s.dismiss);
   useWidgetDataSync();
 
-  const baseTheme = darkMode ? MD3DarkTheme : MD3LightTheme;
-  const paperTheme = {
-    ...baseTheme,
-    colors: {
-      ...baseTheme.colors,
-      primary: themeColor,
-    },
-    fonts: baseTheme.fonts,
-  };
-
-  const navigationTheme = darkMode
-    ? { ...DarkTheme, colors: { ...DarkTheme.colors, primary: themeColor } }
-    : { ...LightTheme, colors: { ...LightTheme.colors, primary: themeColor } };
+  const screenOptions = useMemo(() => {
+    const c = darkMode ? darkColors : lightColors;
+    return {
+      headerTitleStyle: {
+        fontWeight: fontWeight.heading as '800',
+        fontSize: fontSize.subheading,
+      },
+      tabBarActiveTintColor: themeColor,
+      tabBarInactiveTintColor: c.textMuted,
+      tabBarLabelStyle: {
+        fontSize: fontSize.label,
+        fontWeight: fontWeight.label,
+        marginTop: -2,
+        marginBottom: 4,
+      },
+      tabBarStyle: {
+        backgroundColor: c.surface,
+        borderTopColor: c.border,
+        borderTopWidth: 0,
+        height: 60,
+        paddingTop: 6,
+        elevation: 0,
+        shadowOpacity: 0,
+      },
+    };
+  }, [darkMode, themeColor]);
 
   return (
-    <PaperProvider theme={paperTheme}>
-      <StatusBar style={darkMode ? 'light' : 'dark'} />
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: themeColor,
-          headerTitleStyle: { fontWeight: 'bold' },
-          ...(darkMode
-            ? {
-                headerStyle: { backgroundColor: navigationTheme.colors.background },
-                headerTintColor: navigationTheme.colors.text,
-                tabBarStyle: { backgroundColor: navigationTheme.colors.background },
-              }
-            : {}),
-        }}
-      >
+    <ThemeProvider>
+      <Tabs screenOptions={screenOptions}>
         <Tabs.Screen
           name="index"
           options={{
             title: '课表',
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="calendar-month" color={color} size={size} />
+              <Icon name="calendar-month" size={size} color={color} />
             ),
           }}
         />
         <Tabs.Screen
           name="schedule"
           options={{
-            title: '课表管理',
+            title: '管理',
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="view-list" color={color} size={size} />
+              <Icon name="view-list" size={size} color={color} />
             ),
           }}
         />
@@ -75,18 +64,11 @@ export default function RootLayout() {
           options={{
             title: '设置',
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="cog" color={color} size={size} />
+              <Icon name="cog" size={size} color={color} />
             ),
           }}
         />
       </Tabs>
-      <Snackbar
-        visible={snackbarMessage !== null}
-        onDismiss={dismissSnackbar}
-        duration={3000}
-      >
-        {snackbarMessage}
-      </Snackbar>
-    </PaperProvider>
+    </ThemeProvider>
   );
 }

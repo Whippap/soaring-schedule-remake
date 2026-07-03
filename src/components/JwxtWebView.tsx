@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Text, useTheme } from 'react-native-paper';
+import { Button, Text } from 'react-native-paper';
 import { WebView } from 'react-native-webview';
 import type { WebViewMessageEvent, WebView as WebViewType } from 'react-native-webview';
 import type { ParsedData } from '@/utils/jwxtParser';
+import { useDesignTokens } from '@/hooks/useDesignTokens';
 
 const NWPU_URL = 'https://ecampus.nwpu.edu.cn/';
 
@@ -155,7 +156,7 @@ interface Props {
 }
 
 export function JwxtWebView({ onDataExtracted, onError }: Props) {
-  const theme = useTheme();
+  const dt = useDesignTokens();
   const webViewRef = useRef<WebViewType>(null);
   const [canExtract, setCanExtract] = useState(false);
   const [extracting, setExtracting] = useState(false);
@@ -189,7 +190,7 @@ export function JwxtWebView({ onDataExtracted, onError }: Props) {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, { backgroundColor: dt.colors.bg }]}>
       <View style={styles.toolbar}>
         <Text variant="labelLarge">
           {canExtract ? '页面已加载，请先登录教务系统并导航到课表页面' : '加载中...'}

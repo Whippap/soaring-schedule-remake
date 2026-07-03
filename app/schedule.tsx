@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { FAB, SegmentedButtons, Text, useTheme } from 'react-native-paper';
-import { StyleSheet, View, Alert } from 'react-native';
+import { FAB, SegmentedButtons, Text } from 'react-native-paper';
+import { View, Alert, StyleSheet } from 'react-native';
 import type { Course, Semester } from '@/types';
 import { createDefaultSemester } from '@/types';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -8,11 +8,13 @@ import { findSemesterForDate } from '@/utils/scheduleDate';
 import { SemesterForm } from '@/components/SemesterForm';
 import { CourseForm } from '@/components/CourseForm';
 import { CourseList } from '@/components/CourseList';
+import { ScreenContainer } from '@/components/ScreenContainer';
+import { useDesignTokens } from '@/hooks/useDesignTokens';
 
 type Mode = 'courses' | 'semesters';
 
 export default function ScheduleScreen() {
-  const theme = useTheme();
+  const dt = useDesignTokens();
   const semesters = useSettingsStore((s) => s.semesters);
   const addSemester = useSettingsStore((s) => s.addSemester);
   const updateSemester = useSettingsStore((s) => s.updateSemester);
@@ -63,7 +65,7 @@ export default function ScheduleScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <ScreenContainer padded={false}>
       <SegmentedButtons
         value={mode}
         onValueChange={(v) => setMode(v as Mode)}
@@ -90,6 +92,7 @@ export default function ScheduleScreen() {
               { text: '删除', style: 'destructive', onPress: () => deleteSemester(s.id) },
             ]);
           }}
+          dt={dt}
         />
       )}
 
@@ -114,7 +117,7 @@ export default function ScheduleScreen() {
         onDismiss={() => setCourseFormVisible(false)}
         onSaved={handleSaveCourse}
       />
-    </View>
+    </ScreenContainer>
   );
 }
 
@@ -123,32 +126,54 @@ interface SemesterListProps {
   currentId: string;
   onEdit: (s: Semester) => void;
   onDelete: (s: Semester) => void;
+  dt: ReturnType<typeof useDesignTokens>;
 }
 
-function SemesterList({ semesters, currentId, onEdit, onDelete }: SemesterListProps) {
-  const theme = useTheme();
-  const handleDelete = (s: Semester) => {
-    onDelete(s);
-  };
+function SemesterList({ semesters, currentId, onEdit, onDelete, dt }: SemesterListProps) {
   return (
     <View style={styles.semesterList}>
       {semesters.map((s) => (
-        <View key={s.id} style={[styles.semesterCard, { borderBottomColor: theme.colors.outline }]}>
+        <View
+          key={s.id}
+          style={[
+            styles.semesterCard,
+            {
+              borderColor: s.id === currentId ? dt.colors.primary : dt.colors.border,
+              borderWidth: s.id === currentId ? 1.5 : 1,
+              backgroundColor: dt.colors.surface,
+              borderRadius: dt.borderRadius.lg,
+            },
+          ]}
+        >
           <View style={{ flex: 1 }}>
-            <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>
-              {s.name}
-              {s.id === currentId ? '  (当前)' : ''}
-            </Text>
-            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading, color: dt.colors.text }}>
+                {s.name}
+              </Text>
+              {s.id === currentId ? (
+                <View style={{ backgroundColor: dt.colors.primary, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 }}>
+                  <Text style={{ fontSize: 10, fontWeight: '600', color: dt.colors.onPrimary }}>当前</Text>
+                </View>
+              ) : null}
+            </View>
+            <Text style={{ fontSize: dt.fontSize.caption, color: dt.colors.textSecondary, marginTop: 4 }}>
               {s.startDate} ~ {s.endDate} · {s.weekCount}周 · {s.sectionCount}节/天
             </Text>
           </View>
-          <Text style={[styles.editLink, { color: theme.colors.primary }]} onPress={() => onEdit(s)}>
-            编辑
-          </Text>
-          <Text style={[styles.deleteLink, { color: '#e74c3c' }]} onPress={() => handleDelete(s)}>
-            删除
-          </Text>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <Text
+              style={{ fontSize: dt.fontSize.caption, color: dt.colors.primary, fontWeight: dt.fontWeight.subheading }}
+              onPress={() => onEdit(s)}
+            >
+              编辑
+            </Text>
+            <Text
+              style={{ fontSize: dt.fontSize.caption, color: dt.colors.destructive, fontWeight: dt.fontWeight.subheading }}
+              onPress={() => onDelete(s)}
+            >
+              删除
+            </Text>
+          </View>
         </View>
       ))}
     </View>
@@ -156,25 +181,13 @@ function SemesterList({ semesters, currentId, onEdit, onDelete }: SemesterListPr
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  segmented: {
-    margin: 12,
-  },
-  semesterList: {
-    paddingHorizontal: 12,
-  },
+  segmented: { margin: 12 },
+  semesterList: { paddingHorizontal: 12, gap: 8 },
   semesterCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    gap: 16,
-  },
-  editLink: {},
-  deleteLink: {
-    color: '#e74c3c',
+    padding: 14,
+    gap: 12,
   },
   fab: {
     position: 'absolute',
