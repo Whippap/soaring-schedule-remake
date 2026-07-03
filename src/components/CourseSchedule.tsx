@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -55,7 +55,7 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
   const [dayMode, setDayMode] = useState<7 | 3>(7);
   const [refreshing, setRefreshing] = useState(false);
   const [detailCourse, setDetailCourse] = useState<Course | null>(null);
-  const scale = useRef(new Animated.Value(1)).current;
+  const [scale] = useState(() => new Animated.Value(1));
 
   const anchor = addDays(new Date(), weekOffset * 7);
   const semester = findSemesterForDate(anchor, semesters);
@@ -64,12 +64,10 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
   const inSemesterRange = !isDefault && weekNumber >= 1 && weekNumber <= semester.weekCount;
 
   const weekStart = startOfWeek(anchor, { weekStartsOn: 1 });
-  const days = useMemo(() => {
-    if (dayMode === 7) {
-      return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
-    }
-    return [anchor, addDays(anchor, 1), addDays(anchor, 2)];
-  }, [dayMode, weekStart, anchor]);
+  const days =
+    dayMode === 7
+      ? Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+      : [anchor, addDays(anchor, 1), addDays(anchor, 2)];
 
   const columnWidth = (SCREEN_WIDTH - TIME_COLUMN_WIDTH) / days.length;
 

@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "soaringschedule",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "android": {
       "package": "com.nwpu.soaringschedule",
       "adaptiveIcon": {
@@ -55,7 +54,8 @@
       "./plugins/withHonorWidget.js"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
     },
     "extra": {
       "eas": {

@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import type { WidgetDataSnapshot } from '@/utils/widgetData';
-import { buildWidgetCourseData, loadWidgetData } from '@/utils/widgetData';
+import { buildWidgetCourseData } from '@/utils/widgetData';
 import { useCourseStore } from '@/stores/courseStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 
@@ -11,15 +11,11 @@ export function WidgetPreview() {
   const courses = useCourseStore((s) => s.courses);
   const semesters = useSettingsStore((s) => s.semesters);
   const darkMode = useSettingsStore((s) => s.darkMode);
-  const [snapshot, setSnapshot] = useState<WidgetDataSnapshot | null>(null);
 
-  useEffect(() => {
-    const built = buildWidgetCourseData(courses, semesters);
-    setSnapshot(built);
-    loadWidgetData().then((saved) => {
-      if (saved) setSnapshot(saved);
-    });
-  }, [courses, semesters]);
+  const snapshot: WidgetDataSnapshot = useMemo(
+    () => buildWidgetCourseData(courses, semesters),
+    [courses, semesters],
+  );
 
   const bgColor = darkMode ? '#1a1a1a' : '#ffffff';
   const textColor = darkMode ? '#ffffff' : '#333333';
@@ -31,7 +27,7 @@ export function WidgetPreview() {
         Widget 预览
       </Text>
       <View style={[styles.widget, { backgroundColor: bgColor }]}>
-        {snapshot && snapshot.items.length > 0 ? (
+        {snapshot.items.length > 0 ? (
           snapshot.items.map((item) => (
             <View key={item.id} style={styles.widgetRow}>
               <View style={[styles.dot, { backgroundColor: item.color ?? '#3498db' }]} />

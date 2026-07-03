@@ -43,4 +43,9 @@ yarn-error.*
 !.easignore
 
 .opencode/
+AGENTS.md
+CLAUDE.md
+DESIGN.md
+REQUIREMENTS.md
 *.apk
+document/

@@ -4,7 +4,7 @@ import { Button, Text, Chip, Switch, Modal, Portal, useTheme, Snackbar } from 'r
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useCourseStore } from '@/stores/courseStore';
 import { enhanceExtractedData, convertToCourses, parseScheduleText, computeMaxWeekAndSection, buildDefaultSectionTimes } from '@/utils/jwxtParser';
-import { formatTimeSlot } from '@/utils/scheduleDate';
+import { formatTimeSlot, toISODate, computeSemesterEndDate } from '@/utils/scheduleDate';
 import { JwxtWebView } from './JwxtWebView';
 import type { ParsedData } from '@/utils/jwxtParser';
 import type { Semester } from '@/types';
@@ -67,11 +67,13 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
     );
     const { maxWeek, maxSection } = computeMaxWeekAndSection(filtered);
     const times = buildDefaultSectionTimes(maxSection);
+    const today = toISODate(new Date());
+    const endDate = computeSemesterEndDate(today, maxWeek);
     const newSemester: Semester = {
       id: `auto-${Date.now()}`,
       name: selectedSem.name,
-      startDate: '',
-      endDate: '',
+      startDate: today,
+      endDate,
       weekCount: maxWeek,
       sectionCount: maxSection,
       sectionTimes: times,

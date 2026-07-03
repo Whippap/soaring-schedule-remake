@@ -23,9 +23,11 @@ export function CourseList({ semesters, currentSemesterId, onEdit }: Props) {
   const theme = useTheme();
   const courses = useCourseStore((s) => s.courses);
   const deleteCourse = useCourseStore((s) => s.deleteCourse);
-  const [filterSemesterId, setFilterSemesterId] = useState(currentSemesterId);
+  const [manualFilterId, setManualFilterId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [menuFor, setMenuFor] = useState<string | null>(null);
+
+  const filterSemesterId = manualFilterId ?? currentSemesterId;
 
   const filtered = useMemo(
     () => courses.filter((c) => c.semesterId === filterSemesterId),
@@ -103,7 +105,7 @@ export function CourseList({ semesters, currentSemesterId, onEdit }: Props) {
           <Chip
             key={s.id}
             selected={s.id === filterSemesterId}
-            onPress={() => setFilterSemesterId(s.id)}
+            onPress={() => setManualFilterId(s.id)}
             style={styles.chip}
           >
             {s.name}
