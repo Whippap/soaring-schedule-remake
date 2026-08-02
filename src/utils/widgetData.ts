@@ -23,8 +23,10 @@ export interface WidgetCourseItem {
 
 export interface WidgetDataSnapshot {
   date: string;
+  tomorrowDate: string;
   semesterName: string;
-  items: WidgetCourseItem[];
+  today: WidgetCourseItem[];
+  tomorrow: WidgetCourseItem[];
 }
 
 function toISODate(date: Date): string {
@@ -34,51 +36,65 @@ function toISODate(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
+function buildDayCourses(
+  date: Date,
+  courses: Course[],
+  semesters: Semester[],
+): WidgetCourseItem[] {
+  const dow = ((date.getDay() + 6) % 7) + 1;
+  const semester = findSemesterForDate(date, semesters);
+  const weekNumber = getWeekNumberForDate(date, semester);
+  const isDefault = semesters.length === 0 || semester.id === 'default';
+  const inRange = !isDefault && weekNumber >= 1 && weekNumber <= semester.weekCount;
+
+  if (!inRange) return [];
+
+  const items: WidgetCourseItem[] = [];
+  for (const course of courses) {
+    if (course.semesterId !== semester.id) continue;
+    for (const slot of course.timeSlots) {
+      if (slot.dayOfWeek !== dow) continue;
+      if (!isWeekInRange(weekNumber, slot.weekRange)) continue;
+      if (!matchesRepeatRule(weekNumber, slot.repeatRule)) continue;
+
+      const sorted = [...slot.classSections].sort((a, b) => a - b);
+      const firstSec = sorted[0];
+      const lastSec = sorted[sorted.length - 1];
+      const startTime = semester.sectionTimes[firstSec - 1]?.start ?? '';
+      const endTime = semester.sectionTimes[lastSec - 1]?.end ?? '';
+
+      items.push({
+        id: `${course.id}-${slot.dayOfWeek}`,
+        name: course.name,
+        location: course.location,
+        color: course.color,
+        sectionRange: formatSections(sorted),
+        startTime,
+        endTime,
+      });
+    }
+  }
+
+  items.sort((a, b) => a.startTime.localeCompare(b.startTime));
+  return items;
+}
+
 export function buildWidgetCourseData(
   courses: Course[],
   semesters: Semester[],
   now: Date = new Date(),
 ): WidgetDataSnapshot {
-  const dow = ((now.getDay() + 6) % 7) + 1;
+  const tomorrowDate = new Date(now);
+  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+
   const semester = findSemesterForDate(now, semesters);
-  const weekNumber = getWeekNumberForDate(now, semester);
-  const isDefault = semesters.length === 0 || semester.id === 'default';
-  const inRange = !isDefault && weekNumber >= 1 && weekNumber <= semester.weekCount;
-
-  const items: WidgetCourseItem[] = [];
-  if (inRange) {
-    for (const course of courses) {
-      if (course.semesterId !== semester.id) continue;
-      for (const slot of course.timeSlots) {
-        if (slot.dayOfWeek !== dow) continue;
-        if (!isWeekInRange(weekNumber, slot.weekRange)) continue;
-        if (!matchesRepeatRule(weekNumber, slot.repeatRule)) continue;
-
-        const sorted = [...slot.classSections].sort((a, b) => a - b);
-        const firstSec = sorted[0];
-        const lastSec = sorted[sorted.length - 1];
-        const startTime = semester.sectionTimes[firstSec - 1]?.start ?? '';
-        const endTime = semester.sectionTimes[lastSec - 1]?.end ?? '';
-
-        items.push({
-          id: `${course.id}-${slot.dayOfWeek}`,
-          name: course.name,
-          location: course.location,
-          color: course.color,
-          sectionRange: formatSections(sorted),
-          startTime,
-          endTime,
-        });
-      }
-    }
-  }
-
-  items.sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   return {
     date: toISODate(now),
+    tomorrowDate: toISODate(tomorrowDate),
     semesterName: semester.name,
-    items: items.slice(0, 2),
+    today: buildDayCourses(now, courses, semesters).slice(0, 2),
+    tomorrow: buildDayCourses(tomorrowDate, courses, semesters).slice(0, 2),
   };
 }
 

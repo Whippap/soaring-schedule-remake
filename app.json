@@ -11,7 +11,7 @@
       "package": "com.nwpu.soaringschedule",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
-        "backgroundColor": "#0D9488",
+        "backgroundColor": "#607d8b",
         "monochromeImage": "./assets/icon/android/res/mipmap-xxxhdpi/ic_launcher_monochrome.png"
       }
     },
@@ -24,7 +24,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#0D9488",
+          "backgroundColor": "#607d8b",
           "image": "./assets/icon/android/play_store_512.png",
           "imageWidth": 120
         }
@@ -38,13 +38,26 @@
             {
               "name": "CourseWidget",
               "label": "翱翔课表",
-              "description": "显示当天课程",
+              "description": "显示今明两天课程",
               "minWidth": "250dp",
               "minHeight": "180dp",
               "targetCellWidth": 4,
               "targetCellHeight": 3,
               "maxResizeWidth": "250dp",
               "maxResizeHeight": "180dp",
+              "resizeMode": "none",
+              "updatePeriodMillis": 1800000
+            },
+            {
+              "name": "SmallCourseWidget",
+              "label": "翱翔课表(小)",
+              "description": "显示当天课程(紧凑)",
+              "minWidth": "180dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 3,
+              "targetCellHeight": 2,
+              "maxResizeWidth": "180dp",
+              "maxResizeHeight": "110dp",
               "resizeMode": "none",
               "updatePeriodMillis": 1800000
             }

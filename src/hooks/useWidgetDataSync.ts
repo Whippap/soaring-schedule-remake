@@ -7,7 +7,7 @@ import {
   saveWidgetDarkMode,
 } from '@/utils/widgetData';
 
-const WIDGET_NAME = 'CourseWidget';
+const WIDGET_NAMES = ['CourseWidget', 'SmallCourseWidget'] as const;
 
 export function useWidgetDataSync() {
   const courses = useCourseStore((s) => s.courses);
@@ -17,7 +17,7 @@ export function useWidgetDataSync() {
   useEffect(() => {
     const snapshot = buildWidgetCourseData(courses, semesters);
     saveWidgetData(snapshot).catch(() => {});
-    updateWidget();
+    WIDGET_NAMES.forEach((name) => updateWidget(name));
   }, [courses, semesters]);
 
   useEffect(() => {
@@ -27,19 +27,26 @@ export function useWidgetDataSync() {
   return null;
 }
 
-async function updateWidget(): Promise<void> {
+async function updateWidget(widgetName: string): Promise<void> {
   try {
     const { requestWidgetUpdate } = await import('react-native-android-widget');
     await requestWidgetUpdate({
-      widgetName: WIDGET_NAME,
+      widgetName,
       renderWidget: async () => {
         const { CourseWidget } = await import('@/widgets/CourseWidget');
         const { loadWidgetData } = await import('@/utils/widgetData');
         const data = await loadWidgetData();
-        const snapshot = data ?? { date: '', semesterName: '假期', items: [] };
+        const snapshot = data ?? {
+          date: '',
+          tomorrowDate: '',
+          semesterName: '假期',
+          today: [],
+          tomorrow: [],
+        };
+        const isSmall = widgetName === 'SmallCourseWidget';
         return {
-          light: CourseWidget({ snapshot, isDark: false }),
-          dark: CourseWidget({ snapshot, isDark: true }),
+          light: CourseWidget({ snapshot, isDark: false, variant: isSmall ? 'small' : 'large' }),
+          dark: CourseWidget({ snapshot, isDark: true, variant: isSmall ? 'small' : 'large' }),
         };
       },
       widgetNotFound: () => {},

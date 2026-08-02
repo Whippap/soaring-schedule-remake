@@ -30,8 +30,8 @@ export function WidgetPreview() {
         Widget 预览
       </Text>
       <View style={[styles.widget, { backgroundColor: bgColor, borderRadius: dt.borderRadius.lg, borderWidth: 1, borderColor: dt.colors.border }]}>
-        {snapshot.items.length > 0 ? (
-          snapshot.items.map((item) => (
+        {snapshot.today.length > 0 ? (
+          snapshot.today.map((item) => (
             <View key={item.id} style={styles.widgetRow}>
               <View style={[styles.dot, { backgroundColor: item.color ?? dt.colors.primary }]} />
               <View style={{ flex: 1 }}>

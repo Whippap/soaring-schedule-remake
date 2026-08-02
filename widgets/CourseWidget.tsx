@@ -1,19 +1,39 @@
 'use no memo';
 import { FlexWidget, TextWidget } from 'react-native-android-widget';
-import type { WidgetDataSnapshot } from '@/utils/widgetData';
+import type { ColorProp } from 'react-native-android-widget';
+import type { WidgetDataSnapshot, WidgetCourseItem } from '@/utils/widgetData';
 import { lightColors, darkColors, courseColors } from '@/design';
 
 interface Props {
   snapshot: WidgetDataSnapshot;
   isDark: boolean;
+  variant?: 'small' | 'large';
 }
 
-export function CourseWidget({ snapshot, isDark }: Props) {
+export function CourseWidget({ snapshot, isDark, variant = 'large' }: Props) {
   const c = isDark ? darkColors : lightColors;
   const bgColor = c.bg;
   const textColor = c.text;
   const subColor = c.textSecondary;
 
+  if (variant === 'small') {
+    return (
+      <FlexWidget
+        style={{
+          width: 'match_parent',
+          height: 'match_parent',
+          backgroundColor: bgColor,
+          borderRadius: 12,
+          padding: 10,
+          flexDirection: 'column',
+        }}
+      >
+        <CourseList items={snapshot.today} emptyText="今天没有课了" fontSize={13} subFontSize={10} textColor={textColor} subColor={subColor} />
+      </FlexWidget>
+    );
+  }
+
+  // large variant: today + tomorrow with vertical divider
   return (
     <FlexWidget
       style={{
@@ -21,26 +41,64 @@ export function CourseWidget({ snapshot, isDark }: Props) {
         height: 'match_parent',
         backgroundColor: bgColor,
         borderRadius: 16,
-        padding: 14,
-        flexDirection: 'column',
+        padding: 12,
+        flexDirection: 'row',
       }}
     >
-      {snapshot.items.length === 0 ? (
+      <FlexWidget style={{ flex: 1, flexDirection: 'column', paddingRight: 8 }}>
+        <TextWidget
+          text="今天"
+          style={{ fontSize: 12, color: subColor, fontWeight: 'bold', marginBottom: 4 }}
+        />
+        <CourseList items={snapshot.today} emptyText="没有课" fontSize={13} subFontSize={10} textColor={textColor} subColor={subColor} />
+      </FlexWidget>
+      <FlexWidget
+        style={{
+          width: 1,
+          backgroundColor: c.border as ColorProp,
+          marginHorizontal: 6,
+        }}
+      />
+      <FlexWidget style={{ flex: 1, flexDirection: 'column', paddingLeft: 8 }}>
+        <TextWidget
+          text="明天"
+          style={{ fontSize: 12, color: subColor, fontWeight: 'bold', marginBottom: 4 }}
+        />
+        <CourseList items={snapshot.tomorrow} emptyText="没有课" fontSize={13} subFontSize={10} textColor={textColor} subColor={subColor} />
+      </FlexWidget>
+    </FlexWidget>
+  );
+}
+
+interface CourseListProps {
+  items: WidgetCourseItem[];
+  emptyText: string;
+  fontSize: number;
+  subFontSize: number;
+  textColor: ColorProp;
+  subColor: ColorProp;
+}
+
+function CourseList({ items, emptyText, fontSize, subFontSize, textColor, subColor }: CourseListProps) {
+  return (
+    <FlexWidget style={{ flex: 1, flexDirection: 'column' }}>
+      {items.length === 0 ? (
         <FlexWidget style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <TextWidget
-            text="今天没有课了"
-            style={{ fontSize: 16, color: subColor, textAlign: 'center' }}
+            text={emptyText}
+            style={{ fontSize, color: subColor, textAlign: 'center' }}
           />
         </FlexWidget>
       ) : (
-        <FlexWidget style={{ flex: 1, flexDirection: 'column', flexGap: 8 }}>
-          {snapshot.items.map((item) => (
-            <FlexWidget key={item.id} style={{ flexDirection: 'row', flexGap: 8, alignItems: 'center' }}>
+        <FlexWidget style={{ flex: 1, flexDirection: 'column', flexGap: 6 }}>
+          {items.map((item) => (
+            <FlexWidget key={item.id} style={{ flexDirection: 'row', flexGap: 6, alignItems: 'flex-start' }}>
               <FlexWidget
                 style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: 5,
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  marginTop: 3,
                   backgroundColor: (item.color ?? courseColors[0]) as `#${string}`,
                 }}
               />
@@ -49,20 +107,20 @@ export function CourseWidget({ snapshot, isDark }: Props) {
                   text={item.name}
                   truncate="END"
                   maxLines={1}
-                  style={{ fontSize: 14, color: textColor, fontWeight: 'bold' }}
+                  style={{ fontSize, color: textColor, fontWeight: 'bold' }}
                 />
                 <TextWidget
                   text={`${item.sectionRange} ${item.startTime}-${item.endTime}`}
                   truncate="END"
                   maxLines={1}
-                  style={{ fontSize: 11, color: subColor }}
+                  style={{ fontSize: subFontSize, color: subColor }}
                 />
                 {item.location ? (
                   <TextWidget
                     text={item.location}
                     truncate="END"
                     maxLines={1}
-                    style={{ fontSize: 11, color: subColor }}
+                    style={{ fontSize: subFontSize, color: subColor }}
                   />
                 ) : null}
               </FlexWidget>
