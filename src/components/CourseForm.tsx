@@ -176,6 +176,7 @@ export function CourseForm({
           style={styles.modalBody}
           bounces={false}
           showsVerticalScrollIndicator={false}
+          nestedScrollEnabled
         >
           {/* Section: Basic Info */}
           <SectionLabel dt={dt} title="基本信息" />
@@ -214,6 +215,9 @@ export function CourseForm({
               </TouchableOpacity>
             ))}
           </ScrollView>
+
+          {/* Section: Details */}
+          <SectionLabel dt={dt} title="详细信息" />
           <View style={styles.row}>
             <TextInput label="课程代码" value={code} onChangeText={setCode} style={styles.halfInput} />
             <TextInput label="学分" value={credits} onChangeText={setCredits} style={styles.halfInput} keyboardType="numeric" />
@@ -222,9 +226,6 @@ export function CourseForm({
             <TextInput label="地点" value={location} onChangeText={setLocation} style={styles.halfInput} />
             <TextInput label="教师" value={teacher} onChangeText={setTeacher} style={styles.halfInput} />
           </View>
-
-          {/* Section: Details */}
-          <SectionLabel dt={dt} title="详细信息" />
           <Text style={[styles.sectionSub, { color: dt.colors.textSecondary, fontSize: dt.fontSize.caption }]}>
             考核方式
           </Text>
@@ -323,63 +324,39 @@ export function CourseForm({
                 {formatTimeSlot(slot)}
               </Text>
 
-              <Text style={[styles.sectionSub, { color: dt.colors.textSecondary, fontSize: dt.fontSize.caption }]}>
-                星期
-              </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {DAY_NAMES.slice(1).map((dayName, i) => {
-                  const selected = slot.dayOfWeek === i + 1;
-                  return (
-                    <TouchableOpacity
-                      key={dayName}
-                      onPress={() => updateSlot(index, { dayOfWeek: i + 1 })}
-                      style={[
-                        styles.chip,
-                        {
-                          borderRadius: dt.borderRadius.pill,
-                          borderColor: selected ? dt.colors.primary : dt.colors.border,
-                          backgroundColor: selected ? `${dt.colors.primary}14` : dt.colors.surfaceAlt,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={{
-                          fontSize: dt.fontSize.caption,
-                          fontWeight: selected ? dt.fontWeight.subheading : dt.fontWeight.body,
-                          color: selected ? dt.colors.primary : dt.colors.textSecondary,
-                        }}
-                      >
-                        {dayName}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
+              <PickerField
+                label="星期"
+                value={slot.dayOfWeek}
+                options={[1, 2, 3, 4, 5, 6, 7]}
+                displayValue={(v) => DAY_NAMES[v]}
+                onSelect={(v) => updateSlot(index, { dayOfWeek: v })}
+                dt={dt}
+              />
 
               <Text style={[styles.sectionSub, { color: dt.colors.textSecondary, fontSize: dt.fontSize.caption }]}>
                 课节 (1-{maxSection})
               </Text>
               <View style={styles.row}>
-                <TextInput
-                  label="开始节"
-                  value={String(slot.classSections[0] ?? 1)}
-                  onChangeText={(v) => {
-                    const n = parseInt(v, 10) || 1;
-                    setSectionRange(index, n, slot.classSections[slot.classSections.length - 1] ?? n);
-                  }}
-                  style={styles.halfInput}
-                  keyboardType="numeric"
-                />
-                <TextInput
-                  label="结束节"
-                  value={String(slot.classSections[slot.classSections.length - 1] ?? 1)}
-                  onChangeText={(v) => {
-                    const n = parseInt(v, 10) || 1;
-                    setSectionRange(index, slot.classSections[0] ?? n, n);
-                  }}
-                  style={styles.halfInput}
-                  keyboardType="numeric"
-                />
+                <View style={styles.halfInput}>
+                  <PickerField
+                    label="开始节"
+                    value={slot.classSections[0] ?? 1}
+                    options={Array.from({ length: maxSection }, (_, i) => i + 1)}
+                    displayValue={(v) => String(v)}
+                    onSelect={(v) => setSectionRange(index, v, slot.classSections[slot.classSections.length - 1] ?? v)}
+                    dt={dt}
+                  />
+                </View>
+                <View style={styles.halfInput}>
+                  <PickerField
+                    label="结束节"
+                    value={slot.classSections[slot.classSections.length - 1] ?? 1}
+                    options={Array.from({ length: maxSection }, (_, i) => i + 1)}
+                    displayValue={(v) => String(v)}
+                    onSelect={(v) => setSectionRange(index, slot.classSections[0] ?? v, v)}
+                    dt={dt}
+                  />
+                </View>
               </View>
 
               <Text style={[styles.sectionSub, { color: dt.colors.textSecondary, fontSize: dt.fontSize.caption }]}>
@@ -519,6 +496,98 @@ function SectionLabel({ dt, title }: { dt: ReturnType<typeof useDesignTokens>; t
         {title}
       </Text>
       <View style={{ flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: dt.colors.border }} />
+    </View>
+  );
+}
+
+interface PickerFieldProps<T> {
+  label: string;
+  value: T;
+  options: T[];
+  displayValue: (v: T) => string;
+  onSelect: (v: T) => void;
+  dt: ReturnType<typeof useDesignTokens>;
+}
+
+function PickerField<T extends string | number>({
+  label,
+  value,
+  options,
+  displayValue,
+  onSelect,
+  dt,
+}: PickerFieldProps<T>) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <View style={{ marginBottom: 8 }}>
+      <TouchableOpacity
+        onPress={() => setOpen(!open)}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 14,
+          paddingVertical: 12,
+          borderWidth: 1,
+          borderColor: dt.colors.border,
+          borderRadius: dt.borderRadius.md,
+          backgroundColor: dt.colors.surface,
+        }}
+        activeOpacity={0.7}
+      >
+        <Text style={{ fontSize: dt.fontSize.body, color: dt.colors.text }}>
+          {label}: {displayValue(value)}
+        </Text>
+        <Icon name={open ? 'chevron-up' : 'chevron-down'} size={16} color={dt.colors.textSecondary} />
+      </TouchableOpacity>
+      {open ? (
+        <View
+          style={{
+            marginTop: 4,
+            borderWidth: 1,
+            borderColor: dt.colors.border,
+            borderRadius: dt.borderRadius.md,
+            backgroundColor: dt.colors.surface,
+            overflow: 'hidden',
+          }}
+        >
+          <ScrollView
+            bounces={false}
+            showsVerticalScrollIndicator
+            nestedScrollEnabled
+            style={{ maxHeight: 200 }}
+          >
+            {options.map((opt) => {
+              const selected = value === opt;
+              return (
+                <TouchableOpacity
+                  key={String(opt)}
+                  onPress={() => {
+                    onSelect(opt);
+                    setOpen(false);
+                  }}
+                  style={{
+                    paddingHorizontal: 14,
+                    paddingVertical: 10,
+                    backgroundColor: selected ? `${dt.colors.primary}14` : 'transparent',
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: dt.fontSize.body,
+                      color: selected ? dt.colors.primary : dt.colors.text,
+                      fontWeight: selected ? dt.fontWeight.subheading : dt.fontWeight.body,
+                    }}
+                  >
+                    {displayValue(opt)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+      ) : null}
     </View>
   );
 }

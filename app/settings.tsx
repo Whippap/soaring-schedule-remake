@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { View, Alert, TouchableOpacity } from 'react-native';
-import { Switch, Text, Snackbar } from 'react-native-paper';
+import { Switch, Text } from 'react-native-paper';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CourseImportWizard } from '@/components/CourseImportWizard';
 import { WidgetPreview } from '@/components/WidgetPreview';
@@ -8,42 +8,43 @@ import { exportData, importData } from '@/utils/dataBackup';
 import { PRESET_COLORS } from '@/types';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
+import { useSnackbar } from '@/hooks/useSnackbar';
 import { Icon } from '@/components/Icon';
 
 export default function SettingsScreen() {
   const dt = useDesignTokens();
+  const showSnackbar = useSnackbar();
   const darkMode = useSettingsStore((s) => s.darkMode);
   const setDarkMode = useSettingsStore((s) => s.setDarkMode);
   const themeColor = useSettingsStore((s) => s.themeColor);
   const setThemeColor = useSettingsStore((s) => s.setThemeColor);
   const formatData = useSettingsStore((s) => s.formatData);
   const [importVisible, setImportVisible] = useState(false);
-  const [snackbar, setSnackbar] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const handleExport = useCallback(async () => {
     setBusy(true);
     try {
-      const ok = await exportData(() => setSnackbar('无数据可导出'));
-      if (ok) setSnackbar('导出成功');
+      const ok = await exportData(() => showSnackbar('无数据可导出'));
+      if (ok) showSnackbar('导出成功');
     } catch {
-      setSnackbar('导出失败');
+      showSnackbar('导出失败');
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [showSnackbar]);
 
   const handleImport = useCallback(async () => {
     setBusy(true);
     try {
       const result = await importData();
-      setSnackbar(result.message);
+      showSnackbar(result.message);
     } catch {
-      setSnackbar('导入失败');
+      showSnackbar('导入失败');
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [showSnackbar]);
 
   const handleFormat = () => {
     Alert.alert('格式化数据', '确定要清空所有数据吗？此操作不可恢复。', [
@@ -53,7 +54,7 @@ export default function SettingsScreen() {
         style: 'destructive',
         onPress: () => {
           formatData();
-          setSnackbar('已清空所有数据');
+          showSnackbar('已清空所有数据');
         },
       },
     ]);
@@ -183,9 +184,6 @@ export default function SettingsScreen() {
       </TouchableOpacity>
 
       <CourseImportWizard visible={importVisible} onDismiss={() => setImportVisible(false)} />
-      <Snackbar visible={snackbar !== null} onDismiss={() => setSnackbar(null)} duration={3000}>
-        {snackbar}
-      </Snackbar>
     </ScreenContainer>
   );
 }

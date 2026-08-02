@@ -4,12 +4,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
-    "web": "expo start --web",
-    "lint": "expo lint",
-    "typecheck": "tsc --noEmit",
-    "ios": "expo run:ios",
+    "start": "npx expo start",
+    "android": "npx expo run:android",
+    "web": "npx expo start --web",
+    "lint": "npx expo lint",
+    "typecheck": "npx tsc --noEmit",
+    "ios": "npx expo run:ios",
     "wsl2": "npx expo start --tunnel"
   },
   "dependencies": {

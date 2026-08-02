@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
-import { Button, Text, Chip, Switch, Modal, Portal, Snackbar } from 'react-native-paper';
+import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
+import { Text, Chip, Switch, Modal, Portal } from 'react-native-paper';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useCourseStore } from '@/stores/courseStore';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
+import { useSnackbar } from '@/hooks/useSnackbar';
 import { enhanceExtractedData, convertToCourses, parseScheduleText, computeMaxWeekAndSection, buildDefaultSectionTimes } from '@/utils/jwxtParser';
 import { formatTimeSlot, toISODate, computeSemesterEndDate } from '@/utils/scheduleDate';
 import { JwxtWebView } from './JwxtWebView';
@@ -20,6 +21,7 @@ type Step = 'webview' | 'select-semester';
 
 export function CourseImportWizard({ visible, onDismiss }: Props) {
   const dt = useDesignTokens();
+  const showSnackbar = useSnackbar();
   const semesters = useSettingsStore((s) => s.semesters);
   const addSemester = useSettingsStore((s) => s.addSemester);
   const addCourse = useCourseStore((s) => s.addCourse);
@@ -31,7 +33,6 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
   const [selectedDataSemester, setSelectedDataSemester] = useState<string | null>(null);
   const [overwriteExisting, setOverwriteExisting] = useState(false);
   const [importing, setImporting] = useState(false);
-  const [snackbar, setSnackbar] = useState<string | null>(null);
   const [showSemesterForm, setShowSemesterForm] = useState(false);
   const [draftSemester, setDraftSemester] = useState<Semester | null>(null);
 
@@ -59,7 +60,7 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
   };
 
   const handleError = (message: string) => {
-    setSnackbar(message);
+    showSnackbar(message);
   };
 
   const handleAutoCreateSemester = useCallback(() => {
@@ -91,12 +92,12 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
     setSelectedSemesterId(s.id);
     setShowSemesterForm(false);
     setDraftSemester(null);
-    setSnackbar(`已创建学期「${s.name}」`);
+    showSnackbar(`已创建学期「${s.name}」`);
   };
 
   const handleImport = () => {
     if (!parsedData || !selectedSemesterId) {
-      setSnackbar('请先选择目标学期');
+      showSnackbar('请先选择目标学期');
       return;
     }
 
@@ -107,7 +108,7 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
     );
 
     if (coursesToImport.length === 0) {
-      setSnackbar('没有找到可导入的课程');
+      showSnackbar('没有找到可导入的课程');
       return;
     }
 
@@ -122,7 +123,7 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
     }
 
     setImporting(false);
-    setSnackbar(`成功导入 ${coursesToImport.length} 门课程，请核对`);
+    showSnackbar(`成功导入 ${coursesToImport.length} 门课程，请核对`);
     setTimeout(() => handleDismiss(), 1500);
   };
 
@@ -135,15 +136,25 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
       <Modal visible={visible} onDismiss={handleDismiss} contentContainerStyle={styles.modal}>
         <View style={[styles.container, { backgroundColor: dt.colors.bg }]}>
           <View style={[styles.header, { borderBottomColor: dt.colors.border }]}>
-            <Text variant="titleLarge">{step === 'webview' ? '导入课表 - 登录教务系统' : '导入课表 - 选择学期'}</Text>
-            <Button onPress={handleDismiss}>取消</Button>
+            <Text
+              style={{
+                fontSize: dt.fontSize.subheading,
+                fontWeight: dt.fontWeight.subheading,
+                color: dt.colors.text,
+              }}
+            >
+              {step === 'webview' ? '导入课表 - 登录教务系统' : '导入课表 - 选择学期'}
+            </Text>
+            <TouchableOpacity onPress={handleDismiss}>
+              <Text style={{ color: dt.colors.textSecondary, fontSize: dt.fontSize.body }}>取消</Text>
+            </TouchableOpacity>
           </View>
 
           {step === 'webview' ? (
             <JwxtWebView onDataExtracted={handleDataExtracted} onError={handleError} />
           ) : (
             <ScrollView style={styles.body}>
-              <Text variant="labelLarge" style={styles.sectionTitle}>
+              <Text style={{ fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading, color: dt.colors.text, marginTop: 12, marginBottom: 8 }}>
                 检测到的学期（共提取 {parsedData?.courses.length ?? 0} 门课程）
               </Text>
               <View style={styles.chipRow}>
@@ -159,7 +170,7 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
                 ))}
               </View>
 
-              <Text variant="labelLarge" style={styles.sectionTitle}>
+              <Text style={{ fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading, color: dt.colors.text, marginTop: 12, marginBottom: 8 }}>
                 选择目标学期
               </Text>
               <View style={styles.chipRow}>
@@ -173,40 +184,50 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
                     {sem.name}
                   </Chip>
                 ))}
-                <Button
-                  mode="outlined"
-                  icon="plus"
-                  compact
+                <TouchableOpacity
                   onPress={() => {
                     setDraftSemester(null);
                     setShowSemesterForm(true);
                   }}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: dt.colors.primary,
+                    borderRadius: dt.borderRadius.pill,
+                    paddingHorizontal: 14,
+                    paddingVertical: 7,
+                  }}
                 >
-                  手动创建学期
-                </Button>
+                  <Text style={{ color: dt.colors.primary, fontSize: dt.fontSize.caption }}>手动创建学期</Text>
+                </TouchableOpacity>
                 {semesters.length === 0 ? (
-                  <Button
-                    mode="contained"
-                    icon="plus"
-                    compact
+                  <TouchableOpacity
                     onPress={handleAutoCreateSemester}
+                    style={{
+                      backgroundColor: dt.colors.primary,
+                      borderRadius: dt.borderRadius.pill,
+                      paddingHorizontal: 14,
+                      paddingVertical: 7,
+                    }}
                   >
-                    自动创建学期
-                  </Button>
+                    <Text style={{ color: dt.colors.onPrimary, fontSize: dt.fontSize.caption }}>自动创建学期</Text>
+                  </TouchableOpacity>
                 ) : null}
               </View>
 
               {selectedSemesterId ? (
                 <View style={styles.overwriteRow}>
-                  <Text>覆盖该学期现有课程</Text>
+                  <Text style={{ color: dt.colors.text, fontSize: dt.fontSize.caption }}>
+                    覆盖该学期现有课程
+                  </Text>
                   <Switch
                     value={overwriteExisting}
                     onValueChange={setOverwriteExisting}
+                    color={dt.colors.primary}
                   />
                 </View>
               ) : null}
 
-              <Text variant="labelLarge" style={styles.sectionTitle}>
+              <Text style={{ fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading, color: dt.colors.text, marginTop: 12, marginBottom: 8 }}>
                 预览（{filteredPreview.length} 门）
               </Text>
               {filteredPreview.slice(0, 5).map((c, i) => (
@@ -223,17 +244,41 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
               ) : null}
 
               <View style={styles.actions}>
-                <Button mode="outlined" onPress={() => setStep('webview')}>
-                  返回
-                </Button>
-                <Button
-                  mode="contained"
+                <TouchableOpacity
+                  onPress={() => setStep('webview')}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: dt.colors.primary,
+                    borderRadius: dt.borderRadius.md,
+                    paddingHorizontal: 16,
+                    paddingVertical: 10,
+                  }}
+                >
+                  <Text style={{ color: dt.colors.primary, fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading }}>
+                    返回
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                   onPress={handleImport}
                   disabled={!selectedSemesterId || importing}
-                  loading={importing}
+                  style={{
+                    backgroundColor: selectedSemesterId && !importing ? dt.colors.primary : dt.colors.surfaceAlt,
+                    borderRadius: dt.borderRadius.md,
+                    paddingHorizontal: 20,
+                    paddingVertical: 10,
+                    opacity: selectedSemesterId && !importing ? 1 : 0.5,
+                  }}
                 >
-                  导入课程
-                </Button>
+                  <Text
+                    style={{
+                      color: selectedSemesterId && !importing ? dt.colors.onPrimary : dt.colors.textMuted,
+                      fontSize: dt.fontSize.body,
+                      fontWeight: dt.fontWeight.subheading,
+                    }}
+                  >
+                    导入课程
+                  </Text>
+                </TouchableOpacity>
               </View>
             </ScrollView>
           )}
@@ -250,9 +295,6 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
         }}
         onSave={handleSemesterSaved}
       />
-      <Snackbar visible={snackbar !== null} onDismiss={() => setSnackbar(null)} duration={3000}>
-        {snackbar}
-      </Snackbar>
     </Portal>
   );
 }
@@ -281,7 +323,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     marginTop: 12,
     marginBottom: 8,
-    fontWeight: 'bold',
   },
   chipRow: {
     flexDirection: 'row',
@@ -312,11 +353,9 @@ const styles = StyleSheet.create({
   },
   previewSlot: {
     fontSize: 12,
-    
     marginTop: 2,
   },
   moreText: {
-    
     marginTop: 8,
     fontStyle: 'italic',
   },

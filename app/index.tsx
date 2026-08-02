@@ -19,6 +19,7 @@ export default function HomeScreen() {
   const [view, setView] = useState<'schedule' | 'calendar'>('schedule');
   const [courseFormVisible, setCourseFormVisible] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [weekOffset, setWeekOffset] = useState(0);
 
   const effectiveSemesters = semesters.length > 0 ? semesters : [createDefaultSemester()];
   const currentSemester = findSemesterForDate(new Date(), semesters);
@@ -28,6 +29,8 @@ export default function HomeScreen() {
       {view === 'schedule' ? (
         <CourseSchedule
           semesters={effectiveSemesters}
+          weekOffset={weekOffset}
+          onWeekChange={setWeekOffset}
           onEdit={(c) => {
             setEditingCourse(c);
             setCourseFormVisible(true);
@@ -93,7 +96,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* + FAB — offset to accommodate bottom bar + view toggle */}
+      {/* + FAB */}
       <FAB
         icon="plus"
         style={{
@@ -106,6 +109,36 @@ export default function HomeScreen() {
           setCourseFormVisible(true);
         }}
       />
+
+      {/* 返回本周 — below FAB, only visible in schedule view when offset ≠ 0 */}
+      {view === 'schedule' && weekOffset !== 0 ? (
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            right: 16,
+            bottom: 20,
+            backgroundColor: dt.colors.primary,
+            paddingHorizontal: 14,
+            paddingVertical: 9,
+            borderRadius: dt.borderRadius.pill,
+            elevation: 6,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+          }}
+          onPress={() => setWeekOffset(0)}
+          activeOpacity={0.7}
+        >
+          <Text style={{
+            fontSize: dt.fontSize.caption,
+            fontWeight: dt.fontWeight.subheading,
+            color: dt.colors.onPrimary,
+          }}>
+            返回本周
+          </Text>
+        </TouchableOpacity>
+      ) : null}
 
       <CourseForm
         key={editingCourse?.id ?? 'new-course'}

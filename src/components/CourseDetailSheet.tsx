@@ -1,15 +1,10 @@
-import { ScrollView, StyleSheet, Pressable, View, TouchableOpacity } from 'react-native';
+import { useMemo, useEffect } from 'react';
+import { ScrollView, StyleSheet, Pressable, View, TouchableOpacity, Animated } from 'react-native';
 import { Text } from 'react-native-paper';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
-import { useEffect } from 'react';
 import type { Course } from '@/types';
 import { formatTimeSlot } from '@/utils/scheduleDate';
+import { getOnColor } from '@/utils/color';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface Props {
   course: Course | null;
@@ -20,38 +15,41 @@ interface Props {
 
 export function CourseDetailSheet({ course, onDismiss, onEdit, onDelete }: Props) {
   const dt = useDesignTokens();
-  const reduced = useReducedMotion();
-  const opacity = useSharedValue(0);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
+  const opacity = useMemo(() => new Animated.Value(0), []);
 
   useEffect(() => {
-    if (!course) return;
-    // eslint-disable-next-line react-hooks/immutability
-    opacity.value = reduced ? 1 : withTiming(1, { duration: 200 });
-  }, [course, opacity, reduced]);
+    if (course) {
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [course, opacity]);
+
+  const handleClose = () => {
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
+    }).start(() => {
+      onDismiss();
+    });
+  };
 
   if (!course) return null;
 
-  const handleClose = () => {
-    // eslint-disable-next-line react-hooks/immutability
-    opacity.value = reduced ? 0 : withTiming(0, { duration: 150 });
-    setTimeout(onDismiss, 150);
-  };
-
   return (
     <View style={styles.overlay}>
-      <Pressable style={styles.scrim} onPress={handleClose} />
+      <Pressable style={[styles.scrim, { backgroundColor: dt.colors.overlay }]} onPress={handleClose} />
       <Animated.View
         style={[
           styles.dialog,
           {
             backgroundColor: dt.colors.surface,
             borderRadius: dt.borderRadius.xl,
+            opacity,
           },
-          animatedStyle,
         ]}
       >
         <View style={[styles.titleBar, { backgroundColor: course.color ?? dt.colors.primary }]}>
@@ -59,7 +57,7 @@ export function CourseDetailSheet({ course, onDismiss, onEdit, onDelete }: Props
             style={{
               fontSize: dt.fontSize.subheading,
               fontWeight: dt.fontWeight.subheading,
-              color: '#FFFFFF',
+              color: getOnColor(course.color ?? dt.colors.primary),
             }}
             numberOfLines={2}
           >
@@ -130,8 +128,9 @@ export function CourseDetailSheet({ course, onDismiss, onEdit, onDelete }: Props
           {onEdit ? (
             <TouchableOpacity
               onPress={() => {
-                onDismiss();
-                onEdit(course);
+                handleClose();
+                // Wait for close animation before opening edit
+                setTimeout(() => onEdit(course), 200);
               }}
               style={[
                 styles.actionPrimary,
@@ -165,12 +164,14 @@ function DetailRow({ dt, label, value }: { dt: ReturnType<typeof useDesignTokens
 
 const styles = StyleSheet.create({
   overlay: {
-    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-    justifyContent: 'center', alignItems: 'center',
+    ...StyleSheet.absoluteFill,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
   },
   scrim: {
-    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    ...StyleSheet.absoluteFill,
+    // backgroundColor set inline via dt.colors.overlay
   },
   dialog: {
     width: '88%',

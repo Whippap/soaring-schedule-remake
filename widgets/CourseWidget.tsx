@@ -1,3 +1,4 @@
+'use no memo';
 import { FlexWidget, TextWidget } from 'react-native-android-widget';
 import type { WidgetDataSnapshot } from '@/utils/widgetData';
 import { lightColors, darkColors, courseColors } from '@/design';

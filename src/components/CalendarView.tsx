@@ -224,7 +224,7 @@ export function CalendarView({ courses, semesters }: Props) {
       {/* Bottom Sheet */}
       {selectedDay ? (
         <View style={styles.sheetOverlay}>
-          <Pressable style={styles.sheetScrim} onPress={hideSheet} />
+          <Pressable style={[styles.sheetScrim, { backgroundColor: dt.colors.overlay }]} onPress={hideSheet} />
           <Animated.View
             style={[
               styles.bottomSheet,
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
   },
   sheetScrim: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    // backgroundColor set inline via dt.colors.overlay
   },
   bottomSheet: {
     maxHeight: '60%',

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Tabs } from 'expo-router';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useWidgetDataSync } from '@/hooks/useWidgetDataSync';
+import '@/widgets/widget-task-handler';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Icon } from '@/components/Icon';
 import { darkColors, lightColors, fontWeight, fontSize } from '@/design';

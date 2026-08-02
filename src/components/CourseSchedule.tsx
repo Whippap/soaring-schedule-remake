@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -10,12 +10,6 @@ import {
   PanResponder,
 } from 'react-native';
 import { Text } from 'react-native-paper';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withSequence,
-} from 'react-native-reanimated';
 import { addDays, startOfWeek, format, isToday } from 'date-fns';
 import type { Course, Semester, TimeSlot } from '@/types';
 import {
@@ -26,8 +20,7 @@ import {
 } from '@/utils/scheduleDate';
 import { useCourseStore } from '@/stores/courseStore';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { Icon } from '@/components/Icon';
+import { getOnColor } from '@/utils/color';
 import { CourseDetailSheet } from '@/components/CourseDetailSheet';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -37,6 +30,8 @@ const DAY_NAMES = ['', '周一', '周二', '周三', '周四', '周五', '周六
 
 interface Props {
   semesters: Semester[];
+  weekOffset: number;
+  onWeekChange: (offset: number) => void;
   onEdit?: (course: Course) => void;
 }
 
@@ -53,17 +48,13 @@ interface RenderedBlock {
   firstSection: number;
 }
 
-export function CourseSchedule({ semesters, onEdit }: Props) {
+export function CourseSchedule({ semesters, weekOffset, onWeekChange, onEdit }: Props) {
   const dt = useDesignTokens();
-  const reduced = useReducedMotion();
   const courses = useCourseStore((s) => s.courses);
   const deleteCourse = useCourseStore((s) => s.deleteCourse);
-  const [weekOffset, setWeekOffset] = useState(0);
   const [dayMode, setDayMode] = useState<7 | 3>(7);
   const [refreshing, setRefreshing] = useState(false);
   const [detailCourse, setDetailCourse] = useState<Course | null>(null);
-
-  const scale = useSharedValue(1);
 
   const anchor = addDays(new Date(), weekOffset * 7);
   const semester = findSemesterForDate(anchor, semesters);
@@ -79,48 +70,30 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
 
   const columnWidth = (SCREEN_WIDTH - TIME_COLUMN_WIDTH) / days.length;
 
-  const goWeek = useCallback(
-    (toValue: number) => {
-      if (reduced) {
-        setWeekOffset(toValue);
-        return;
-      }
-      // eslint-disable-next-line react-hooks/immutability
-      scale.value = withSequence(
-        withSpring(0.96, { damping: 15, stiffness: 200 }),
-         
-        withSpring(1, { damping: 15, stiffness: 200 }),
-      );
-      setWeekOffset(toValue);
-    },
-    [scale, reduced],
-  );
-
-  const animatedGrid = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const swipeThreshold = 60;
+  const swipeThreshold = 25;
   const weekOffsetRef = useRef(weekOffset);
-  const goWeekRef = useRef(goWeek);
   useEffect(() => {
-    goWeekRef.current = goWeek;
     weekOffsetRef.current = weekOffset;
   });
-  const panResponder = useRef(
-    // eslint-disable-next-line react-hooks/refs
-    PanResponder.create({
+  const onWeekChangeRef = useRef(onWeekChange);
+  useEffect(() => {
+    onWeekChangeRef.current = onWeekChange;
+  });
+  const [panHandlers, setPanHandlers] = useState<object>({});
+  useLayoutEffect(() => {
+    const responder = PanResponder.create({
       onMoveShouldSetPanResponder: (_, gs) =>
-        Math.abs(gs.dx) > 20 && Math.abs(gs.dx) > Math.abs(gs.dy),
+        Math.abs(gs.dx) > 10 && Math.abs(gs.dx) > Math.abs(gs.dy) * 0.6,
       onPanResponderRelease: (_, gs) => {
         if (gs.dx > swipeThreshold) {
-          goWeekRef.current(weekOffsetRef.current - 1);
+          onWeekChangeRef.current(weekOffsetRef.current - 1);
         } else if (gs.dx < -swipeThreshold) {
-          goWeekRef.current(weekOffsetRef.current + 1);
+          onWeekChangeRef.current(weekOffsetRef.current + 1);
         }
       },
-    }),
-  ).current;
+    });
+    setPanHandlers(responder.panHandlers);
+  }, []);
 
   const getInstancesForDay = (date: Date): CourseInstance[] => {
     const dow = ((date.getDay() + 6) % 7) + 1;
@@ -288,8 +261,7 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
         </View>
 
         {/* Grid Body */}
-        {/* eslint-disable-next-line react-hooks/refs */}
-        <Animated.View style={[styles.gridBody, animatedGrid]} {...panResponder.panHandlers}>
+        <View style={styles.gridBody} {...panHandlers}>
           {/* Time Column */}
           <View style={{ width: TIME_COLUMN_WIDTH }}>
             {Array.from({ length: semester.sectionCount }, (_, i) => i + 1).map((sec) => (
@@ -355,7 +327,7 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
                           {
                             color: isDefault || !inSemesterRange
                               ? dt.colors.textMuted
-                              : '#FFFFFF',
+                              : getOnColor(blockColor),
                           },
                         ]}
                         numberOfLines={2}
@@ -369,7 +341,7 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
                             {
                               color: isDefault || !inSemesterRange
                                 ? dt.colors.textMuted
-                                : 'rgba(255,255,255,0.85)',
+                                : getOnColor(blockColor, 0.85),
                             },
                           ]}
                           numberOfLines={1}
@@ -383,36 +355,9 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
               </View>
             );
           })}
-        </Animated.View>
+        </View>
         <View style={{ height: 80 }} />
       </ScrollView>
-
-      {/* Week Navigation */}
-      <View style={styles.navBar}>
-        <TouchableOpacity
-          style={[styles.navBtn, { backgroundColor: dt.colors.surface, borderColor: dt.colors.border }]}
-          onPress={() => goWeek(weekOffset - 1)}
-          activeOpacity={0.7}
-        >
-          <Icon name="chevron-left" size={22} color={dt.colors.text} />
-        </TouchableOpacity>
-        {weekOffset !== 0 ? (
-          <TouchableOpacity
-            style={[styles.todayBtn, { backgroundColor: dt.colors.primary }]}
-            onPress={() => goWeek(0)}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.todayBtnText, { color: dt.colors.onPrimary }]}>返回本周</Text>
-          </TouchableOpacity>
-        ) : null}
-        <TouchableOpacity
-          style={[styles.navBtn, { backgroundColor: dt.colors.surface, borderColor: dt.colors.border }]}
-          onPress={() => goWeek(weekOffset + 1)}
-          activeOpacity={0.7}
-        >
-          <Icon name="chevron-right" size={22} color={dt.colors.text} />
-        </TouchableOpacity>
-      </View>
 
       <CourseDetailSheet
         course={detailCourse}
@@ -500,33 +445,6 @@ const styles = StyleSheet.create({
   courseLoc: {
     fontSize: 10,
     marginTop: 2,
-  },
-  navBar: {
-    position: 'absolute',
-    bottom: 16,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  navBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  todayBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  todayBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
   },
 });
 

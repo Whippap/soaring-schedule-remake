@@ -180,13 +180,13 @@ function SemesterList({ semesters, currentId, onEdit, onDelete, dt }: SemesterLi
                 {s.name}
               </Text>
               {s.id === currentId ? (
-                <View style={{ backgroundColor: dt.colors.primary, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '600', color: dt.colors.onPrimary }}>当前</Text>
+                <View style={{ backgroundColor: dt.colors.primary, paddingHorizontal: 8, paddingVertical: 2, borderRadius: dt.borderRadius.sm }}>
+                  <Text style={{ fontSize: dt.fontSize.label, fontWeight: dt.fontWeight.label, color: dt.colors.onPrimary }}>当前</Text>
                 </View>
               ) : null}
               {isDefault ? (
-                <View style={{ backgroundColor: dt.colors.surfaceAlt, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 }}>
-                  <Text style={{ fontSize: 10, color: dt.colors.textMuted }}>默认</Text>
+                <View style={{ backgroundColor: dt.colors.surfaceAlt, paddingHorizontal: 8, paddingVertical: 2, borderRadius: dt.borderRadius.sm }}>
+                  <Text style={{ fontSize: dt.fontSize.label, color: dt.colors.textMuted }}>默认</Text>
                 </View>
               ) : null}
             </View>
