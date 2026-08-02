@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { FAB, SegmentedButtons, Text } from 'react-native-paper';
 import { View, Alert, StyleSheet } from 'react-native';
 import type { Course, Semester } from '@/types';
@@ -34,41 +34,45 @@ export default function ScheduleScreen() {
     semesters.length > 0 ? semesters : [createDefaultSemester()];
   const currentSemester = findSemesterForDate(new Date(), semesters);
 
-  const openNewSemester = () => {
+  const openNewSemester = useCallback(() => {
     setEditingSemester(null);
-    setSemesterFormVisible(true);
-  };
+    setTimeout(() => setSemesterFormVisible(true), 0);
+  }, []);
 
-  const openEditSemester = (s: Semester) => {
+  const openEditSemester = useCallback((s: Semester) => {
     setEditingSemester(s);
-    setSemesterFormVisible(true);
-  };
+    setTimeout(() => setSemesterFormVisible(true), 0);
+  }, []);
 
-  const handleSaveSemester = (s: Semester) => {
+  const handleSaveSemester = useCallback((s: Semester) => {
     if (editingSemester) {
       updateSemester(s.id, s);
     } else {
       addSemester(s);
     }
     setSemesterFormVisible(false);
-  };
+  }, [editingSemester, updateSemester, addSemester]);
 
-  const handleSaveCourse = () => {
+  const handleSaveCourse = useCallback(() => {
     setCourseFormVisible(false);
     setEditingCourse(null);
-  };
+  }, []);
 
-  const openNewCourse = () => {
+  const openNewCourse = useCallback(() => {
     setEditingCourse(null);
-    setCourseFormVisible(true);
-  };
+    setTimeout(() => setCourseFormVisible(true), 0);
+  }, []);
 
-  const openEditCourse = (c: Course) => {
+  const openEditCourse = useCallback((c: Course) => {
     setEditingCourse(c);
-    setCourseFormVisible(true);
-  };
+    setTimeout(() => setCourseFormVisible(true), 0);
+  }, []);
 
-  const handleDeleteCourse = (course: Course) => {
+  const dismissCourseForm = useCallback(() => setCourseFormVisible(false), []);
+  const dismissSemesterForm = useCallback(() => setSemesterFormVisible(false), []);
+  const dismissDetail = useCallback(() => setDetailCourse(null), []);
+
+  const handleDeleteCourse = useCallback((course: Course) => {
     Alert.alert('删除课程', `确定删除「${course.name}」吗？`, [
       { text: '取消', style: 'cancel' },
       {
@@ -80,7 +84,7 @@ export default function ScheduleScreen() {
         },
       },
     ]);
-  };
+  }, [deleteCourse]);
 
   return (
     <ScreenContainer padded={false}>
@@ -122,25 +126,23 @@ export default function ScheduleScreen() {
       )}
 
       <SemesterForm
-        key={editingSemester?.id ?? 'new-semester'}
         visible={semesterFormVisible}
         existing={semesters}
         editing={editingSemester}
-        onDismiss={() => setSemesterFormVisible(false)}
+        onDismiss={dismissSemesterForm}
         onSave={handleSaveSemester}
       />
       <CourseForm
-        key={editingCourse?.id ?? 'new-course'}
         visible={courseFormVisible}
         semesters={effectiveSemesters}
         defaultSemesterId={currentSemester.id}
         editing={editingCourse}
-        onDismiss={() => setCourseFormVisible(false)}
+        onDismiss={dismissCourseForm}
         onSaved={handleSaveCourse}
       />
       <CourseDetailSheet
         course={detailCourse}
-        onDismiss={() => setDetailCourse(null)}
+        onDismiss={dismissDetail}
         onDelete={handleDeleteCourse}
       />
     </ScreenContainer>

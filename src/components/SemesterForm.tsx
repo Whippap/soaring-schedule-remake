@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useLayoutEffect, useRef } from 'react';
 import { Platform, StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
-import { Modal, Portal, TextInput, Text, HelperText } from 'react-native-paper';
+import { TextInput, Text, HelperText } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format, parseISO, isValid } from 'date-fns';
 import type { Semester, SectionTime } from '@/types';
@@ -9,6 +9,7 @@ import { computeSemesterEndDate } from '@/utils/scheduleDate';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { Icon } from '@/components/Icon';
+import { FormModal } from '@/components/FormModal';
 
 interface Props {
   visible: boolean;
@@ -82,6 +83,27 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
   );
   const [selectedPreset, setSelectedPreset] = useState('长安校区');
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // 当弹窗打开或编辑对象变化时，同步重置表单
+  const editingId = editing?.id ?? '__new__';
+  const prevVisibleRef = useRef(visible);
+  const lastResetIdRef = useRef(editingId);
+
+  // ref 手动检测变化，无需 deps 数组；setState 函数稳定，不会导致无限循环
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useLayoutEffect(() => {
+    const justOpened = visible && !prevVisibleRef.current;
+    prevVisibleRef.current = visible;
+
+    if (justOpened || editingId !== lastResetIdRef.current) {
+      lastResetIdRef.current = editingId;
+      setName(editing?.name ?? '');
+      setStartDate(editing?.startDate ?? '');
+      setWeekCount(String(editing?.weekCount ?? 20));
+      setSectionCount(String(editing?.sectionCount ?? 13));
+      setSectionTimes(editing?.sectionTimes ?? createDefaultSemester().sectionTimes);
+    }
+  });
 
   const parsedDate = (() => {
     if (!startDate) return new Date();
@@ -166,18 +188,17 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
   };
 
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={onDismiss}
-        contentContainerStyle={[
-          styles.modal,
-          {
-            backgroundColor: dt.colors.surface,
-            borderRadius: dt.borderRadius.xl,
-          },
-        ]}
-      >
+    <FormModal
+      visible={visible}
+      onDismiss={onDismiss}
+      contentContainerStyle={[
+        styles.modal,
+        {
+          backgroundColor: dt.colors.surface,
+          borderRadius: dt.borderRadius.xl,
+        },
+      ]}
+    >
         <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
           <Text
             style={{
@@ -313,8 +334,7 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
             </TouchableOpacity>
           </View>
         </ScrollView>
-      </Modal>
-    </Portal>
+    </FormModal>
   );
 }
 

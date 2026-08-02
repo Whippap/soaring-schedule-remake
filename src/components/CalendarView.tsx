@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react';
+import { memo, useMemo, useState, useCallback } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, Pressable } from 'react-native';
 import { Text } from 'react-native-paper';
 import Animated, {
@@ -24,6 +24,7 @@ import {
   getWeekNumberForDate,
   isWeekInRange,
   matchesRepeatRule,
+  toISODate,
 } from '@/utils/scheduleDate';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -42,7 +43,7 @@ interface DayCourses {
   count: number;
 }
 
-export function CalendarView({ courses, semesters }: Props) {
+export const CalendarView = memo(function CalendarView({ courses, semesters }: Props) {
   const dt = useDesignTokens();
   const reduced = useReducedMotion();
   const [cursor, setCursor] = useState(new Date());
@@ -59,14 +60,12 @@ export function CalendarView({ courses, semesters }: Props) {
   }, [cursor]);
 
   const showSheet = useCallback(() => {
-    // eslint-disable-next-line react-hooks/immutability
     sheetTranslateY.value = reduced ? 0 : withSpring(0, { damping: 20, stiffness: 150 });
   }, [sheetTranslateY, reduced]);
 
   const hideSheet = useCallback(() => {
     const target = 400;
     if (reduced) {
-      // eslint-disable-next-line react-hooks/immutability
       sheetTranslateY.value = target;
       runOnJS(setSelectedDay)(null);
       return;
@@ -81,28 +80,37 @@ export function CalendarView({ courses, semesters }: Props) {
     transform: [{ translateY: sheetTranslateY.value }],
   }));
 
-  const getCoursesOn = (date: Date): Course[] => {
-    const dow = ((date.getDay() + 6) % 7) + 1;
-    const semester = findSemesterForDate(date, semesters);
-    if (semester.id === 'default' && semesters.length > 0) return [];
-    const weekNumber = getWeekNumberForDate(date, semester);
-    if (weekNumber < 1 || weekNumber > semester.weekCount) return [];
-    const seen = new Set<string>();
-    const result: Course[] = [];
-    for (const c of courses) {
-      if (c.semesterId !== semester.id) continue;
-      const matches = c.timeSlots.some(
-        (slot) =>
-          slot.dayOfWeek === dow &&
-          isWeekInRange(weekNumber, slot.weekRange) &&
-          matchesRepeatRule(weekNumber, slot.repeatRule),
-      );
-      if (matches && !seen.has(c.id)) {
-        seen.add(c.id);
-        result.push(c);
+  // 预计算每天课程映射，避免 per-day O(courses × slots) 重复计算
+  const coursesByDay = useMemo(() => {
+    const map = new Map<string, Course[]>();
+    for (const date of days) {
+      const dow = ((date.getDay() + 6) % 7) + 1;
+      const semester = findSemesterForDate(date, semesters);
+      if (semester.id === 'default' && semesters.length > 0) continue;
+      const weekNumber = getWeekNumberForDate(date, semester);
+      if (weekNumber < 1 || weekNumber > semester.weekCount) continue;
+      const seen = new Set<string>();
+      const result: Course[] = [];
+      for (const c of courses) {
+        if (c.semesterId !== semester.id) continue;
+        const matches = c.timeSlots.some(
+          (slot) =>
+            slot.dayOfWeek === dow &&
+            isWeekInRange(weekNumber, slot.weekRange) &&
+            matchesRepeatRule(weekNumber, slot.repeatRule),
+        );
+        if (matches && !seen.has(c.id)) {
+          seen.add(c.id);
+          result.push(c);
+        }
       }
+      map.set(toISODate(date), result);
     }
-    return result;
+    return map;
+  }, [days, courses, semesters]);
+
+  const getCoursesOn = (date: Date): Course[] => {
+    return coursesByDay.get(toISODate(date)) ?? [];
   };
 
   const handleDayPress = (date: Date) => {
@@ -290,7 +298,7 @@ export function CalendarView({ courses, semesters }: Props) {
       ) : null}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

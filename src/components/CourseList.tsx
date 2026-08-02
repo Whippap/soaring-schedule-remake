@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { memo, useMemo, useState, useCallback, useEffect } from 'react';
 import {
   FlatList,
   RefreshControl,
@@ -205,7 +205,11 @@ function AnimatedCard({
   );
 }
 
-export function CourseList({ semesters, currentSemesterId, onEdit, onDetail }: Props) {
+function ListSeparator() {
+  return <View style={{ height: 8 }} />;
+}
+
+const CourseListInner = memo(function CourseList({ semesters, currentSemesterId, onEdit, onDetail }: Props) {
   const dt = useDesignTokens();
   const reduced = useReducedMotion();
   const courses = useCourseStore((s) => s.courses);
@@ -304,14 +308,16 @@ export function CourseList({ semesters, currentSemesterId, onEdit, onDetail }: P
             description="点击下方 + 按钮添加课程"
           />
         }
-        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+        ItemSeparatorComponent={ListSeparator}
         removeClippedSubviews={false}
         maxToRenderPerBatch={10}
         windowSize={7}
       />
     </View>
   );
-}
+});
+
+export { CourseListInner as CourseList };
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
@@ -384,4 +390,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CourseList;
+export default CourseListInner;

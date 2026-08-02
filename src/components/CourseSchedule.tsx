@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { memo, useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -17,6 +17,7 @@ import {
   getWeekNumberForDate,
   isWeekInRange,
   matchesRepeatRule,
+  toISODate,
 } from '@/utils/scheduleDate';
 import { useCourseStore } from '@/stores/courseStore';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
@@ -48,7 +49,7 @@ interface RenderedBlock {
   firstSection: number;
 }
 
-export function CourseSchedule({ semesters, weekOffset, onWeekChange, onEdit }: Props) {
+export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffset, onWeekChange, onEdit }: Props) {
   const dt = useDesignTokens();
   const courses = useCourseStore((s) => s.courses);
   const deleteCourse = useCourseStore((s) => s.deleteCourse);
@@ -63,10 +64,13 @@ export function CourseSchedule({ semesters, weekOffset, onWeekChange, onEdit }: 
   const inSemesterRange = !isDefault && weekNumber >= 1 && weekNumber <= semester.weekCount;
 
   const weekStart = startOfWeek(anchor, { weekStartsOn: 1 });
-  const days =
-    dayMode === 7
-      ? Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
-      : [anchor, addDays(anchor, 1), addDays(anchor, 2)];
+  const days = useMemo(
+    () =>
+      dayMode === 7
+        ? Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+        : [anchor, addDays(anchor, 1), addDays(anchor, 2)],
+    [dayMode, weekStart, anchor],
+  );
 
   const columnWidth = (SCREEN_WIDTH - TIME_COLUMN_WIDTH) / days.length;
 
@@ -95,37 +99,42 @@ export function CourseSchedule({ semesters, weekOffset, onWeekChange, onEdit }: 
     setPanHandlers(responder.panHandlers);
   }, []);
 
-  const getInstancesForDay = (date: Date): CourseInstance[] => {
-    const dow = ((date.getDay() + 6) % 7) + 1;
-    const instances: CourseInstance[] = [];
-    for (const course of courses) {
-      if (course.semesterId !== semester.id) continue;
-      for (const slot of course.timeSlots) {
-        if (slot.dayOfWeek !== dow) continue;
-        if (!isWeekInRange(weekNumber, slot.weekRange)) continue;
-        if (!matchesRepeatRule(weekNumber, slot.repeatRule)) continue;
-        instances.push({ course, sections: slot.classSections, slot });
+  // 预计算每天课程块，避免重复遍历 courses × slots（原 O(7 × courses × slots) → O(courses × slots)）
+  const blocksByDay = useMemo(() => {
+    const map = new Map<string, RenderedBlock[]>();
+    for (const date of days) {
+      const dateStr = toISODate(date);
+      const dow = ((date.getDay() + 6) % 7) + 1;
+      const instances: CourseInstance[] = [];
+      for (const course of courses) {
+        if (course.semesterId !== semester.id) continue;
+        for (const slot of course.timeSlots) {
+          if (slot.dayOfWeek !== dow) continue;
+          if (!isWeekInRange(weekNumber, slot.weekRange)) continue;
+          if (!matchesRepeatRule(weekNumber, slot.repeatRule)) continue;
+          instances.push({ course, sections: slot.classSections, slot });
+        }
       }
+      const blocks: RenderedBlock[] = [];
+      const covered = new Set<string>();
+      for (const inst of instances) {
+        const key = `${inst.course.id}-${inst.slot.dayOfWeek}`;
+        if (covered.has(key)) continue;
+        covered.add(key);
+        blocks.push({
+          course: inst.course,
+          slot: inst.slot,
+          sections: inst.sections,
+          firstSection: Math.min(...inst.sections),
+        });
+      }
+      map.set(dateStr, blocks);
     }
-    return instances;
-  };
+    return map;
+  }, [days, courses, semester.id, weekNumber]);
 
   const getBlocksForDay = (date: Date): RenderedBlock[] => {
-    const instances = getInstancesForDay(date);
-    const blocks: RenderedBlock[] = [];
-    const covered = new Set<string>();
-    for (const inst of instances) {
-      const key = `${inst.course.id}-${inst.slot.dayOfWeek}`;
-      if (covered.has(key)) continue;
-      covered.add(key);
-      blocks.push({
-        course: inst.course,
-        slot: inst.slot,
-        sections: inst.sections,
-        firstSection: Math.min(...inst.sections),
-      });
-    }
-    return blocks;
+    return blocksByDay.get(toISODate(date)) ?? [];
   };
 
   const onRefresh = () => {
@@ -367,7 +376,7 @@ export function CourseSchedule({ semesters, weekOffset, onWeekChange, onEdit }: 
       />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

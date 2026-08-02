@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { FAB, Text } from 'react-native-paper';
 import { View, TouchableOpacity } from 'react-native';
 import type { Course } from '@/types';
@@ -24,6 +24,25 @@ export default function HomeScreen() {
   const effectiveSemesters = semesters.length > 0 ? semesters : [createDefaultSemester()];
   const currentSemester = findSemesterForDate(new Date(), semesters);
 
+  const handleEdit = useCallback((c: Course) => {
+    setEditingCourse(c);
+    setTimeout(() => setCourseFormVisible(true), 0);
+  }, []);
+
+  const handleNewCourse = useCallback(() => {
+    setEditingCourse(null);
+    setTimeout(() => setCourseFormVisible(true), 0);
+  }, []);
+
+  const handleCourseFormDismiss = useCallback(() => {
+    setCourseFormVisible(false);
+  }, []);
+
+  const handleCourseFormSaved = useCallback(() => {
+    setCourseFormVisible(false);
+    setEditingCourse(null);
+  }, []);
+
   return (
     <ScreenContainer padded={false}>
       {view === 'schedule' ? (
@@ -31,10 +50,7 @@ export default function HomeScreen() {
           semesters={effectiveSemesters}
           weekOffset={weekOffset}
           onWeekChange={setWeekOffset}
-          onEdit={(c) => {
-            setEditingCourse(c);
-            setCourseFormVisible(true);
-          }}
+          onEdit={handleEdit}
         />
       ) : (
         <CalendarView courses={courses} semesters={effectiveSemesters} />
@@ -104,10 +120,7 @@ export default function HomeScreen() {
           right: 16,
           bottom: 80,
         }}
-        onPress={() => {
-          setEditingCourse(null);
-          setCourseFormVisible(true);
-        }}
+        onPress={handleNewCourse}
       />
 
       {/* 返回本周 — below FAB, only visible in schedule view when offset ≠ 0 */}
@@ -141,13 +154,12 @@ export default function HomeScreen() {
       ) : null}
 
       <CourseForm
-        key={editingCourse?.id ?? 'new-course'}
         visible={courseFormVisible}
         semesters={effectiveSemesters}
         defaultSemesterId={currentSemester.id}
         editing={editingCourse}
-        onDismiss={() => setCourseFormVisible(false)}
-        onSaved={() => setCourseFormVisible(false)}
+        onDismiss={handleCourseFormDismiss}
+        onSaved={handleCourseFormSaved}
       />
     </ScreenContainer>
   );

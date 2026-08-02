@@ -9,8 +9,18 @@ export function findSemesterForDate(date: Date, semesters: Semester[]): Semester
   );
 }
 
+const semesterStartCache = new Map<string, Date>();
+
+function getSemesterStart(startDate: string): Date {
+  const cached = semesterStartCache.get(startDate);
+  if (cached) return cached;
+  const parsed = parseISO(startDate);
+  semesterStartCache.set(startDate, parsed);
+  return parsed;
+}
+
 export function getWeekNumberForDate(date: Date, semester: Semester): number {
-  const start = parseISO(semester.startDate);
+  const start = getSemesterStart(semester.startDate);
   const diff = differenceInCalendarDays(date, start);
   return diff < 0 ? 0 : Math.floor(diff / 7) + 1;
 }
@@ -29,7 +39,12 @@ export function matchesRepeatRule(weekNumber: number, repeatRule: RepeatRule): b
   return true;
 }
 
+const parseWeeksCache = new Map<string, number[]>();
+
 export function parseWeeks(weekRange: string): number[] {
+  const cached = parseWeeksCache.get(weekRange);
+  if (cached) return cached;
+
   const weeks: number[] = [];
   for (const part of weekRange.split(',')) {
     const trimmed = part.trim();
@@ -49,7 +64,12 @@ export function parseWeeks(weekRange: string): number[] {
       }
     }
   }
+  parseWeeksCache.set(weekRange, weeks);
   return weeks;
+}
+
+export function clearParseWeeksCache(): void {
+  parseWeeksCache.clear();
 }
 
 export function toISODate(date: Date): string {

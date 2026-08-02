@@ -1,7 +1,5 @@
-import { useState } from 'react';
+import { useState, useLayoutEffect, useRef } from 'react';
 import {
-  Modal,
-  Portal,
   TextInput,
   Text,
   HelperText,
@@ -17,6 +15,7 @@ import { useCourseStore } from '@/stores/courseStore';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { Icon } from '@/components/Icon';
+import { FormModal } from '@/components/FormModal';
 
 interface Props {
   visible: boolean;
@@ -89,6 +88,32 @@ export function CourseForm({
   const updateCourse = useCourseStore((s) => s.updateCourse);
   const courses = useCourseStore((s) => s.courses);
 
+  // 当弹窗打开或编辑对象变化时，同步重置表单（useLayoutEffect 确保同一帧内完成，用户看不到中间态）
+  const editingId = editing?.id ?? '__new__';
+  const prevVisibleRef = useRef(visible);
+  const lastResetIdRef = useRef(editingId);
+
+  // ref 手动检测变化，无需 deps 数组；setState 函数稳定，不会导致无限循环
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useLayoutEffect(() => {
+    const justOpened = visible && !prevVisibleRef.current;
+    prevVisibleRef.current = visible;
+
+    if (justOpened || editingId !== lastResetIdRef.current) {
+      lastResetIdRef.current = editingId;
+      setName(editing?.name ?? '');
+      setSemesterId(editing?.semesterId ?? defaultSemesterId);
+      setCode(editing?.code ?? '');
+      setLocation(editing?.location ?? '');
+      setTeacher(editing?.teacher ?? '');
+      setCredits(editing?.credits ? String(editing.credits) : '');
+      setAssessmentMethod(editing?.assessmentMethod ?? AssessmentMethod.EXAM);
+      setNotes(editing?.notes ?? '');
+      setColor(editing?.color ?? PRESET_COLORS[0]);
+      setTimeSlots(editing?.timeSlots ?? [emptySlot()]);
+    }
+  });
+
   const selectedSemester = semesters.find((s) => s.id === semesterId);
   const maxWeek = selectedSemester?.weekCount ?? 20;
   const maxSection = selectedSemester?.sectionCount ?? 13;
@@ -147,15 +172,14 @@ export function CourseForm({
   };
 
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={onDismiss}
-        contentContainerStyle={[
-          styles.modal,
-          { backgroundColor: dt.colors.surface, borderRadius: dt.borderRadius.xl },
-        ]}
-      >
+    <FormModal
+      visible={visible}
+      onDismiss={onDismiss}
+      contentContainerStyle={[
+        styles.modal,
+        { backgroundColor: dt.colors.surface, borderRadius: dt.borderRadius.xl },
+      ]}
+    >
         {/* Fixed Header */}
         <View style={[styles.modalHeader, { borderBottomColor: dt.colors.border }]}>
           <Text
@@ -474,8 +498,7 @@ export function CourseForm({
             </Text>
           </TouchableOpacity>
         </View>
-      </Modal>
-    </Portal>
+    </FormModal>
   );
 }
 
