@@ -39,11 +39,11 @@
               "name": "CourseWidget",
               "label": "翱翔课表",
               "description": "显示当天课程",
-              "minWidth": "280dp",
+              "minWidth": "250dp",
               "minHeight": "180dp",
               "targetCellWidth": 4,
               "targetCellHeight": 3,
-              "maxResizeWidth": "280dp",
+              "maxResizeWidth": "250dp",
               "maxResizeHeight": "180dp",
               "resizeMode": "none",
               "updatePeriodMillis": 1800000

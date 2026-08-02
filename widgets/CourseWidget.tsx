@@ -17,8 +17,8 @@ export function CourseWidget({ snapshot, isDark }: Props) {
   return (
     <FlexWidget
       style={{
-        width: 280,
-        height: 180,
+        width: 'match_parent',
+        height: 'match_parent',
         backgroundColor: bgColor,
         borderRadius: 16,
         padding: 14,
