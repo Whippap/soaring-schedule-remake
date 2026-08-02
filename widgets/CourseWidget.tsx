@@ -45,23 +45,23 @@ export function CourseWidget({ snapshot, isDark, variant = 'large' }: Props) {
         flexDirection: 'row',
       }}
     >
-      <FlexWidget style={{ flex: 1, flexDirection: 'column' }}>
+      <FlexWidget style={{ width: 0, flex: 1, flexDirection: 'column' }}>
         <TextWidget
           text="今天"
           style={{ fontSize: 12, color: subColor, fontWeight: 'bold', marginBottom: 4 }}
         />
         <CourseList items={snapshot.today} emptyText="没有课" fontSize={13} subFontSize={10} textColor={textColor} subColor={subColor} />
       </FlexWidget>
-      <FlexWidget style={{ width: 16, flexDirection: 'column', alignItems: 'center' }}>
+      <FlexWidget style={{ width: 16, height: 'match_parent', alignItems: 'center' }}>
         <FlexWidget
           style={{
             width: 1,
-            flex: 1,
+            height: 'match_parent',
             backgroundColor: c.border as ColorProp,
           }}
         />
       </FlexWidget>
-      <FlexWidget style={{ flex: 1, flexDirection: 'column' }}>
+      <FlexWidget style={{ width: 0, flex: 1, flexDirection: 'column' }}>
         <TextWidget
           text="明天"
           style={{ fontSize: 12, color: subColor, fontWeight: 'bold', marginBottom: 4 }}
