@@ -3,7 +3,6 @@ import { View, Alert, TouchableOpacity } from 'react-native';
 import { Switch, Text } from 'react-native-paper';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CourseImportWizard } from '@/components/CourseImportWizard';
-import { WidgetPreview } from '@/components/WidgetPreview';
 import { exportData, importData } from '@/utils/dataBackup';
 import { PRESET_COLORS } from '@/types';
 import { ScreenContainer } from '@/components/ScreenContainer';
@@ -141,9 +140,6 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
-        <View style={{ marginTop: 16 }}>
-          <WidgetPreview />
         </View>
       </View>
 
