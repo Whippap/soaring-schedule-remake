@@ -24,9 +24,9 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#0D9488",
+          "image": "./assets/icon/android/play_store_512.png",
+          "imageWidth": 120
         }
       ],
       "expo-font",
