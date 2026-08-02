@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Dimensions,
   RefreshControl,
-  Pressable,
   Alert,
   PanResponder,
 } from 'react-native';
@@ -16,7 +15,6 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withSequence,
-  runOnJS,
 } from 'react-native-reanimated';
 import { addDays, startOfWeek, format, isToday } from 'date-fns';
 import type { Course, Semester, TimeSlot } from '@/types';
@@ -25,12 +23,12 @@ import {
   getWeekNumberForDate,
   isWeekInRange,
   matchesRepeatRule,
-  formatTimeSlot,
 } from '@/utils/scheduleDate';
 import { useCourseStore } from '@/stores/courseStore';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { Icon } from '@/components/Icon';
+import { CourseDetailSheet } from '@/components/CourseDetailSheet';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ROW_HEIGHT = 52;
@@ -66,8 +64,6 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
   const [detailCourse, setDetailCourse] = useState<Course | null>(null);
 
   const scale = useSharedValue(1);
-  const sheetTranslateY = useSharedValue(400);
-  const sheetVisible = useSharedValue(0);
 
   const anchor = addDays(new Date(), weekOffset * 7);
   const semester = findSemesterForDate(anchor, semesters);
@@ -100,38 +96,9 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
     [scale, reduced],
   );
 
-  const showSheet = useCallback(() => {
-    // eslint-disable-next-line react-hooks/immutability
-    sheetVisible.value = 1;
-    // eslint-disable-next-line react-hooks/immutability
-    sheetTranslateY.value = reduced ? 0 : withSpring(0, { damping: 20, stiffness: 150 });
-  }, [sheetVisible, sheetTranslateY, reduced]);
-
-  const hideSheet = useCallback(() => {
-    const target = 400;
-    if (reduced) {
-      // eslint-disable-next-line react-hooks/immutability
-      sheetTranslateY.value = target;
-      // eslint-disable-next-line react-hooks/immutability
-      sheetVisible.value = 0;
-      runOnJS(setDetailCourse)(null);
-      return;
-    }
-     
-    sheetTranslateY.value = withSpring(target, { damping: 20, stiffness: 150 }, () => {
-       
-      sheetVisible.value = 0;
-      runOnJS(setDetailCourse)(null);
-    });
-  }, [sheetTranslateY, sheetVisible, reduced]);
-
-  const handleCoursePress = useCallback(
-    (course: Course) => {
-      setDetailCourse(course);
-      showSheet();
-    },
-    [showSheet],
-  );
+  const animatedGrid = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   const swipeThreshold = 60;
   const weekOffsetRef = useRef(weekOffset);
@@ -154,14 +121,6 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
       },
     }),
   ).current;
-
-  const animatedGrid = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const animatedSheet = useAnimatedStyle(() => ({
-    transform: [{ translateY: sheetTranslateY.value }],
-  }));
 
   const getInstancesForDay = (date: Date): CourseInstance[] => {
     const dow = ((date.getDay() + 6) % 7) + 1;
@@ -210,7 +169,6 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
         onPress: () => {
           deleteCourse(course.id);
           setDetailCourse(null);
-          hideSheet();
         },
       },
     ]);
@@ -377,7 +335,7 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
                     <TouchableOpacity
                       key={`${block.course.id}-${dow}-${idx}`}
                       activeOpacity={0.85}
-                      onPress={() => handleCoursePress(block.course)}
+                      onPress={() => setDetailCourse(block.course)}
                       style={[
                         styles.courseBlock,
                         {
@@ -456,130 +414,12 @@ export function CourseSchedule({ semesters, onEdit }: Props) {
         </TouchableOpacity>
       </View>
 
-      {/* Bottom Sheet - Course Detail */}
-      {detailCourse ? (
-        <View style={styles.sheetOverlay}>
-          <Pressable style={styles.sheetScrim} onPress={hideSheet} />
-          <Animated.View
-            style={[
-              styles.bottomSheet,
-              {
-                backgroundColor: dt.colors.surface,
-                borderTopLeftRadius: dt.borderRadius.xl,
-                borderTopRightRadius: dt.borderRadius.xl,
-              },
-              animatedSheet,
-            ]}
-          >
-            <View style={styles.sheetHandle}>
-              <View style={[styles.handleBar, { backgroundColor: dt.colors.border }]} />
-            </View>
-            <View style={[styles.sheetBar, { backgroundColor: detailCourse.color ?? dt.colors.primary }]}>
-              <Text
-                style={{
-                  fontSize: dt.fontSize.subheading,
-                  fontWeight: dt.fontWeight.subheading,
-                  color: '#FFFFFF',
-                }}
-                numberOfLines={2}
-              >
-                {detailCourse.name}
-              </Text>
-            </View>
-            <ScrollView
-              style={styles.sheetBody}
-              bounces={false}
-              showsVerticalScrollIndicator={false}
-            >
-              <DetailRow dt={dt} label="课程代码" value={detailCourse.code} />
-              <DetailRow dt={dt} label="地点" value={detailCourse.location} />
-              <DetailRow dt={dt} label="教师" value={detailCourse.teacher} />
-              <DetailRow
-                dt={dt}
-                label="学分"
-                value={detailCourse.credits != null ? String(detailCourse.credits) : undefined}
-              />
-              <DetailRow dt={dt} label="考核方式" value={detailCourse.assessmentMethod} />
-              <Text
-                style={{
-                  fontSize: dt.fontSize.caption,
-                  fontWeight: dt.fontWeight.subheading,
-                  color: dt.colors.text,
-                  marginTop: dt.spacing.md,
-                  marginBottom: 4,
-                }}
-              >
-                时间段
-              </Text>
-              {detailCourse.timeSlots.map((slot, i) => (
-                <Text
-                  key={i}
-                  style={{ fontSize: dt.fontSize.caption, color: dt.colors.textSecondary, marginVertical: 2 }}
-                >
-                  {formatTimeSlot(slot)}
-                </Text>
-              ))}
-              {detailCourse.notes ? (
-                <>
-                  <Text
-                    style={{
-                      fontSize: dt.fontSize.caption,
-                      fontWeight: dt.fontWeight.subheading,
-                      color: dt.colors.text,
-                      marginTop: dt.spacing.md,
-                      marginBottom: 4,
-                    }}
-                  >
-                    备注
-                  </Text>
-                  <Text style={{ fontSize: dt.fontSize.caption, color: dt.colors.textSecondary }}>
-                    {detailCourse.notes}
-                  </Text>
-                </>
-              ) : null}
-            </ScrollView>
-            <View style={[styles.sheetActions, { borderTopColor: dt.colors.border }]}>
-              <TouchableOpacity onPress={hideSheet} style={styles.sheetAction}>
-                <Text style={{ color: dt.colors.textSecondary, fontSize: dt.fontSize.body }}>关闭</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleDelete(detailCourse)}
-                style={styles.sheetAction}
-              >
-                <Text style={{ color: dt.colors.destructive, fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading }}>
-                  删除
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  const c = detailCourse;
-                  hideSheet();
-                  onEdit?.(c);
-                }}
-                style={[styles.sheetActionPrimary, { backgroundColor: dt.colors.primary }]}
-              >
-                <Text style={{ color: dt.colors.onPrimary, fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading }}>
-                  编辑
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </View>
-      ) : null}
-    </View>
-  );
-}
-
-function DetailRow({ dt, label, value }: { dt: ReturnType<typeof useDesignTokens>; label: string; value?: string }) {
-  if (!value) return null;
-  return (
-    <View style={{ flexDirection: 'row', marginVertical: 2 }}>
-      <Text style={{ width: 72, fontSize: dt.fontSize.caption, color: dt.colors.textMuted }}>
-        {label}
-      </Text>
-      <Text style={{ flex: 1, fontSize: dt.fontSize.caption, color: dt.colors.text }}>
-        {value}
-      </Text>
+      <CourseDetailSheet
+        course={detailCourse}
+        onDismiss={() => setDetailCourse(null)}
+        onEdit={onEdit}
+        onDelete={handleDelete}
+      />
     </View>
   );
 }
@@ -687,55 +527,6 @@ const styles = StyleSheet.create({
   todayBtnText: {
     fontSize: 13,
     fontWeight: '600',
-  },
-  sheetOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'flex-end',
-  },
-  sheetScrim: {
-    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  bottomSheet: {
-    maxHeight: '75%',
-    overflow: 'hidden',
-  },
-  sheetHandle: {
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  handleBar: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-  },
-  sheetBar: {
-    padding: 16,
-  },
-  sheetBody: {
-    padding: 16,
-    maxHeight: 300,
-  },
-  sheetActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    padding: 12,
-    gap: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  sheetAction: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  sheetActionPrimary: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
   },
 });
 

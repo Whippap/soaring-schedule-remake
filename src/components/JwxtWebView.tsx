@@ -193,7 +193,7 @@ export function JwxtWebView({ onDataExtracted, onError }: Props) {
     <View style={[styles.container, { backgroundColor: dt.colors.bg }]}>
       <View style={styles.toolbar}>
         <Text variant="labelLarge">
-          {canExtract ? '页面已加载，请先登录教务系统并导航到课表页面' : '加载中...'}
+          {canExtract ? '请进入“我的课表-全部课程”页面' : '加载中...'}
         </Text>
         <Button
           mode="contained"

@@ -27,6 +27,7 @@ interface Props {
   semesters: Semester[];
   currentSemesterId: string;
   onEdit: (course: Course) => void;
+  onDetail?: (course: Course) => void;
 }
 
 function AnimatedCard({
@@ -36,6 +37,7 @@ function AnimatedCard({
   onDelete,
   dt,
   reduced,
+  onDetail,
 }: {
   course: Course;
   index: number;
@@ -43,6 +45,7 @@ function AnimatedCard({
   onDelete: (c: Course) => void;
   dt: ReturnType<typeof useDesignTokens>;
   reduced: boolean;
+  onDetail?: (c: Course) => void;
 }) {
   const opacity = useSharedValue(reduced ? 1 : 0);
   const translateY = useSharedValue(reduced ? 0 : 12);
@@ -92,6 +95,8 @@ function AnimatedCard({
         onPress={() => {
           if (showMenu) {
             closeMenu();
+          } else {
+            onDetail?.(course);
           }
         }}
         delayLongPress={400}
@@ -200,7 +205,7 @@ function AnimatedCard({
   );
 }
 
-export function CourseList({ semesters, currentSemesterId, onEdit }: Props) {
+export function CourseList({ semesters, currentSemesterId, onEdit, onDetail }: Props) {
   const dt = useDesignTokens();
   const reduced = useReducedMotion();
   const courses = useCourseStore((s) => s.courses);
@@ -243,9 +248,10 @@ export function CourseList({ semesters, currentSemesterId, onEdit }: Props) {
         onDelete={handleDelete}
         dt={dt}
         reduced={reduced}
+        onDetail={onDetail}
       />
     ),
-    [onEdit, dt, handleDelete, reduced],
+    [onEdit, dt, handleDelete, reduced, onDetail],
   );
 
   return (

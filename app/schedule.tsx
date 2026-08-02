@@ -4,10 +4,12 @@ import { View, Alert, StyleSheet } from 'react-native';
 import type { Course, Semester } from '@/types';
 import { createDefaultSemester } from '@/types';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { useCourseStore } from '@/stores/courseStore';
 import { findSemesterForDate } from '@/utils/scheduleDate';
 import { SemesterForm } from '@/components/SemesterForm';
 import { CourseForm } from '@/components/CourseForm';
 import { CourseList } from '@/components/CourseList';
+import { CourseDetailSheet } from '@/components/CourseDetailSheet';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 
@@ -19,12 +21,14 @@ export default function ScheduleScreen() {
   const addSemester = useSettingsStore((s) => s.addSemester);
   const updateSemester = useSettingsStore((s) => s.updateSemester);
   const deleteSemester = useSettingsStore((s) => s.deleteSemester);
+  const deleteCourse = useCourseStore((s) => s.deleteCourse);
 
   const [mode, setMode] = useState<Mode>('courses');
   const [semesterFormVisible, setSemesterFormVisible] = useState(false);
   const [editingSemester, setEditingSemester] = useState<Semester | null>(null);
   const [courseFormVisible, setCourseFormVisible] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [detailCourse, setDetailCourse] = useState<Course | null>(null);
 
   const effectiveSemesters =
     semesters.length > 0 ? semesters : [createDefaultSemester()];
@@ -64,6 +68,20 @@ export default function ScheduleScreen() {
     setCourseFormVisible(true);
   };
 
+  const handleDeleteCourse = (course: Course) => {
+    Alert.alert('删除课程', `确定删除「${course.name}」吗？`, [
+      { text: '取消', style: 'cancel' },
+      {
+        text: '删除',
+        style: 'destructive',
+        onPress: () => {
+          deleteCourse(course.id);
+          setDetailCourse(null);
+        },
+      },
+    ]);
+  };
+
   return (
     <ScreenContainer padded={false}>
       <SegmentedButtons
@@ -80,6 +98,7 @@ export default function ScheduleScreen() {
           semesters={effectiveSemesters}
           currentSemesterId={currentSemester.id}
           onEdit={openEditCourse}
+          onDetail={setDetailCourse}
         />
       ) : (
         <SemesterList
@@ -118,6 +137,11 @@ export default function ScheduleScreen() {
         editing={editingCourse}
         onDismiss={() => setCourseFormVisible(false)}
         onSaved={handleSaveCourse}
+      />
+      <CourseDetailSheet
+        course={detailCourse}
+        onDismiss={() => setDetailCourse(null)}
+        onDelete={handleDeleteCourse}
       />
     </ScreenContainer>
   );

@@ -191,12 +191,15 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
           </Text>
 
           <TextInput
-            label="学期名称"
+            label="学期名称 *"
             value={name}
             onChangeText={setName}
             style={styles.input}
             placeholder="如 2025-2026春"
           />
+          <Text style={{ fontSize: dt.fontSize.caption, color: dt.colors.textSecondary, marginTop: 8, marginBottom: 6 }}>
+            开始日期 <Text style={{ color: dt.colors.destructive }}>*</Text>
+          </Text>
           <TouchableOpacity
             onPress={() => setShowDatePicker(true)}
             style={[
@@ -224,14 +227,14 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
           ) : null}
           <View style={styles.row}>
             <TextInput
-              label="周数"
+              label="周数 *"
               value={weekCount}
               onChangeText={setWeekCount}
               style={styles.halfInput}
               keyboardType="numeric"
             />
             <TextInput
-              label="每天节数"
+              label="每天节数 *"
               value={sectionCount}
               onChangeText={handleSectionCountChange}
               style={styles.halfInput}

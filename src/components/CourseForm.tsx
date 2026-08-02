@@ -186,7 +186,7 @@ export function CourseForm({
             style={styles.input}
           />
           <Text style={[styles.sectionSub, { color: dt.colors.textSecondary, fontSize: dt.fontSize.caption }]}>
-            所属学期
+            所属学期 <Text style={{ color: dt.colors.destructive, fontSize: dt.fontSize.caption }}>*</Text>
           </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
             {semesters.map((s) => (
@@ -288,7 +288,7 @@ export function CourseForm({
           />
 
           {/* Section: Time Slots */}
-          <SectionLabel dt={dt} title="时间段" />
+          <SectionLabel dt={dt} title="时间段 *" />
           {timeSlots.map((slot, index) => (
             <View
               key={index}

@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { PaperProvider, MD3DarkTheme, MD3LightTheme, Snackbar } from 'react-native-paper';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useSnackbarStore } from '@/hooks/useSnackbar';
+import { darkColors, lightColors } from '@/design';
 
 interface Props {
   children: ReactNode;
@@ -16,11 +17,16 @@ export function ThemeProvider({ children }: Props) {
 
   const paperTheme = useMemo(() => {
     const base = darkMode ? MD3DarkTheme : MD3LightTheme;
+    const c = darkMode ? darkColors : lightColors;
     return {
       ...base,
       colors: {
         ...base.colors,
         primary: themeColor,
+        surfaceVariant: c.surfaceAlt,
+        onSurfaceVariant: c.textSecondary,
+        outline: c.border,
+        outlineVariant: c.border,
       },
       fonts: base.fonts,
     };
