@@ -60,13 +60,30 @@ function SmallWidget({
         backgroundColor: bgColor,
         borderRadius: 12,
         padding: 10,
-        flexDirection: 'column',
+        flexDirection: 'row',
       }}
     >
-      <TextWidget
-        text="今日课程"
-        style={{ fontSize: 12, color: subColor, fontWeight: 'bold', marginBottom: 6 }}
-      />
+      {/* Vertical title on the left */}
+      <FlexWidget
+        style={{ flexDirection: 'column', alignItems: 'center', marginRight: 8 }}
+      >
+        <TextWidget
+          text="今"
+          style={{ fontSize: 11, color: subColor, fontWeight: 'bold' }}
+        />
+        <TextWidget
+          text="日"
+          style={{ fontSize: 11, color: subColor, fontWeight: 'bold' }}
+        />
+        <TextWidget
+          text="课"
+          style={{ fontSize: 11, color: subColor, fontWeight: 'bold' }}
+        />
+        <TextWidget
+          text="程"
+          style={{ fontSize: 11, color: subColor, fontWeight: 'bold' }}
+        />
+      </FlexWidget>
       {upcoming.length === 0 ? (
         <FlexWidget style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <TextWidget
@@ -143,6 +160,7 @@ function LargeWidget({
           {Array.from({ length: maxRows }, (_, i) => (
             <FlexWidget
               key={i}
+              clickAction="WIDGET_REFRESH"
               style={{
                 width: 'match_parent',
                 flexDirection: 'row',
