@@ -179,9 +179,7 @@ function LargeWidget({
                   <FlexWidget
                     clickAction="WIDGET_REFRESH"
                     style={{
-                      height: 'match_parent',
                       alignItems: 'center',
-                      justifyContent: 'center',
                     }}
                   >
                     <TextWidget
@@ -223,9 +221,7 @@ function LargeWidget({
                   <FlexWidget
                     clickAction="WIDGET_REFRESH"
                     style={{
-                      height: 'match_parent',
                       alignItems: 'center',
-                      justifyContent: 'center',
                     }}
                   >
                     <TextWidget
