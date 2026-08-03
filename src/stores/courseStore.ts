@@ -6,7 +6,9 @@ import { parseWeeks } from '@/utils/scheduleDate';
 import { isCourseConflict } from '@/utils/timeConflict';
 
 interface CourseState {
+  hydrated: boolean;
   courses: Course[];
+  setHydrated: (hydrated: boolean) => void;
   addCourse: (course: Course) => void;
   updateCourse: (id: string, updates: Partial<Course>) => void;
   deleteCourse: (id: string) => void;
@@ -20,7 +22,9 @@ interface CourseState {
 export const useCourseStore = create<CourseState>()(
   persist(
     (set, get) => ({
+      hydrated: false,
       courses: [],
+      setHydrated: (hydrated) => set({ hydrated }),
       addCourse: (course) => set((s) => ({ courses: [...s.courses, course] })),
       updateCourse: (id, updates) =>
         set((s) => ({
@@ -66,6 +70,10 @@ export const useCourseStore = create<CourseState>()(
     {
       name: 'soaring-schedule-courses',
       storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({ courses: state.courses }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHydrated(true);
+      },
     },
   ),
 );

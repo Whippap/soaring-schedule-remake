@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { InteractionManager } from 'react-native';
 import { useCourseStore } from '@/stores/courseStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import {
@@ -9,20 +10,39 @@ import {
 
 const WIDGET_NAMES = ['CourseWidget', 'SmallCourseWidget'] as const;
 
-export function useWidgetDataSync() {
+export function useWidgetDataSync(enabled = true) {
   const courses = useCourseStore((s) => s.courses);
   const semesters = useSettingsStore((s) => s.semesters);
   const darkMode = useSettingsStore((s) => s.darkMode);
 
   useEffect(() => {
-    const snapshot = buildWidgetCourseData(courses, semesters);
-    saveWidgetData(snapshot).catch(() => {});
-    WIDGET_NAMES.forEach((name) => updateWidget(name));
-  }, [courses, semesters]);
+    if (!enabled) return;
+    let cancelled = false;
+    const task = InteractionManager.runAfterInteractions(() => {
+      if (cancelled) return;
+      const snapshot = buildWidgetCourseData(courses, semesters);
+      saveWidgetData(snapshot).catch(() => {});
+      WIDGET_NAMES.forEach((name) => updateWidget(name));
+    });
+    return () => {
+      cancelled = true;
+      task.cancel?.();
+    };
+  }, [enabled, courses, semesters]);
 
   useEffect(() => {
-    saveWidgetDarkMode(darkMode).catch(() => {});
-  }, [darkMode]);
+    if (!enabled) return;
+    let cancelled = false;
+    const task = InteractionManager.runAfterInteractions(() => {
+      if (!cancelled) {
+        saveWidgetDarkMode(darkMode).catch(() => {});
+      }
+    });
+    return () => {
+      cancelled = true;
+      task.cancel?.();
+    };
+  }, [enabled, darkMode]);
 
   return null;
 }

@@ -6,9 +6,11 @@ import { DEFAULT_THEME_COLOR } from '@/types';
 import { useCourseStore } from './courseStore';
 
 interface SettingsState {
+  hydrated: boolean;
   semesters: Semester[];
   themeColor: string;
   darkMode: boolean;
+  setHydrated: (hydrated: boolean) => void;
   addSemester: (semester: Semester) => void;
   updateSemester: (id: string, updates: Partial<Semester>) => void;
   deleteSemester: (id: string) => void;
@@ -30,9 +32,11 @@ function dateRangesOverlap(
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set, get) => ({
+      hydrated: false,
       semesters: [],
       themeColor: DEFAULT_THEME_COLOR,
       darkMode: false,
+      setHydrated: (hydrated) => set({ hydrated }),
       addSemester: (semester) => set((s) => ({ semesters: [...s.semesters, semester] })),
       updateSemester: (id, updates) => {
         const current = get().semesters.find((sm) => sm.id === id);
@@ -67,6 +71,14 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: 'soaring-schedule-settings',
       storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        semesters: state.semesters,
+        themeColor: state.themeColor,
+        darkMode: state.darkMode,
+      }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHydrated(true);
+      },
     },
   ),
 );

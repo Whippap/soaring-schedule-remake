@@ -1,6 +1,6 @@
 import { useState, useLayoutEffect, useRef } from 'react';
 import { Platform, StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
-import { TextInput, Text, HelperText } from 'react-native-paper';
+import { Text, HelperText } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format, parseISO, isValid } from 'date-fns';
 import type { Semester, SectionTime } from '@/types';
@@ -10,6 +10,7 @@ import { useSnackbar } from '@/hooks/useSnackbar';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { Icon } from '@/components/Icon';
 import { FormModal } from '@/components/FormModal';
+import { AppTextField } from '@/components/AppTextField';
 
 interface Props {
   visible: boolean;
@@ -211,7 +212,7 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
             {editing ? '编辑学期' : '新建学期'}
           </Text>
 
-          <TextInput
+          <AppTextField
             label="学期名称 *"
             value={name}
             onChangeText={setName}
@@ -247,14 +248,14 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
             />
           ) : null}
           <View style={styles.row}>
-            <TextInput
+            <AppTextField
               label="周数 *"
               value={weekCount}
               onChangeText={setWeekCount}
               style={styles.halfInput}
               keyboardType="numeric"
             />
-            <TextInput
+            <AppTextField
               label="每天节数 *"
               value={sectionCount}
               onChangeText={handleSectionCountChange}

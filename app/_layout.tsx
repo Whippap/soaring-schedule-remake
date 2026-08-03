@@ -1,16 +1,26 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Tabs } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useWidgetDataSync } from '@/hooks/useWidgetDataSync';
+import { useAppHydrated } from '@/hooks/useAppHydrated';
 import '@/widgets/widget-task-handler';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Icon } from '@/components/Icon';
 import { darkColors, lightColors, fontWeight, fontSize } from '@/design';
 
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
 export default function RootLayout() {
   const darkMode = useSettingsStore((s) => s.darkMode);
   const themeColor = useSettingsStore((s) => s.themeColor);
-  useWidgetDataSync();
+  const appHydrated = useAppHydrated();
+  useWidgetDataSync(appHydrated);
+
+  useEffect(() => {
+    if (!appHydrated) return;
+    SplashScreen.hideAsync().catch(() => {});
+  }, [appHydrated]);
 
   const screenOptions = useMemo(() => {
     const c = darkMode ? darkColors : lightColors;
@@ -39,6 +49,10 @@ export default function RootLayout() {
       },
     };
   }, [darkMode, themeColor]);
+
+  if (!appHydrated) {
+    return null;
+  }
 
   return (
     <ThemeProvider>

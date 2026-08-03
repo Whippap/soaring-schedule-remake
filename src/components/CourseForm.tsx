@@ -1,6 +1,5 @@
 import { useState, useLayoutEffect, useRef } from 'react';
 import {
-  TextInput,
   Text,
   HelperText,
 } from 'react-native-paper';
@@ -16,6 +15,7 @@ import { useSnackbar } from '@/hooks/useSnackbar';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { Icon } from '@/components/Icon';
 import { FormModal } from '@/components/FormModal';
+import { AppTextField } from '@/components/AppTextField';
 
 interface Props {
   visible: boolean;
@@ -204,7 +204,7 @@ export function CourseForm({
         >
           {/* Section: Basic Info */}
           <SectionLabel dt={dt} title="基本信息" />
-          <TextInput
+          <AppTextField
             label="课程名称 *"
             value={name}
             onChangeText={setName}
@@ -243,12 +243,12 @@ export function CourseForm({
           {/* Section: Details */}
           <SectionLabel dt={dt} title="详细信息" />
           <View style={styles.row}>
-            <TextInput label="课程代码" value={code} onChangeText={setCode} style={styles.halfInput} />
-            <TextInput label="学分" value={credits} onChangeText={setCredits} style={styles.halfInput} keyboardType="numeric" />
+            <AppTextField label="课程代码" value={code} onChangeText={setCode} style={styles.halfInput} />
+            <AppTextField label="学分" value={credits} onChangeText={setCredits} style={styles.halfInput} keyboardType="numeric" />
           </View>
           <View style={styles.row}>
-            <TextInput label="地点" value={location} onChangeText={setLocation} style={styles.halfInput} />
-            <TextInput label="教师" value={teacher} onChangeText={setTeacher} style={styles.halfInput} />
+            <AppTextField label="地点" value={location} onChangeText={setLocation} style={styles.halfInput} />
+            <AppTextField label="教师" value={teacher} onChangeText={setTeacher} style={styles.halfInput} />
           </View>
           <Text style={[styles.sectionSub, { color: dt.colors.textSecondary, fontSize: dt.fontSize.caption }]}>
             考核方式
@@ -304,7 +304,7 @@ export function CourseForm({
             })}
           </View>
 
-          <TextInput
+          <AppTextField
             label="备注"
             value={notes}
             onChangeText={setNotes}
