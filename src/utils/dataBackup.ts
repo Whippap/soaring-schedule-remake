@@ -3,6 +3,8 @@ import * as Sharing from 'expo-sharing';
 import { File, Paths } from 'expo-file-system';
 import type { Course, Semester } from '@/types';
 import { DEFAULT_THEME_COLOR } from '@/types';
+import { useCourseStore } from '@/stores/courseStore';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 const COURSES_KEY = 'soaring-schedule-courses';
 const SETTINGS_KEY = 'soaring-schedule-settings';
@@ -106,6 +108,14 @@ export async function importData(): Promise<{ success: boolean; message: string 
       SETTINGS_KEY,
       JSON.stringify({ state: parsed.settings, version: 0 }),
     );
+
+    // 直接更新 Zustand store 内存状态，避免必须重启应用
+    useCourseStore.setState({ courses: parsed.courses });
+    useSettingsStore.setState({
+      semesters: parsed.settings.semesters,
+      themeColor: parsed.settings.themeColor,
+      darkMode: parsed.settings.darkMode,
+    });
 
     return {
       success: true,
