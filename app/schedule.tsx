@@ -143,6 +143,7 @@ export default function ScheduleScreen() {
       <CourseDetailSheet
         course={detailCourse}
         onDismiss={dismissDetail}
+        onEdit={openEditCourse}
         onDelete={handleDeleteCourse}
       />
     </ScreenContainer>
