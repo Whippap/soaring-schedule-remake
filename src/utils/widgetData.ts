@@ -25,8 +25,14 @@ export interface WidgetDataSnapshot {
   date: string;
   tomorrowDate: string;
   semesterName: string;
+  /** 当天前 2 门课（小 Widget 快速取用） */
   today: WidgetCourseItem[];
+  /** 明天前 2 门课 */
   tomorrow: WidgetCourseItem[];
+  /** 当天全部课程（大 Widget 滚动列表） */
+  allToday: WidgetCourseItem[];
+  /** 明天全部课程（大 Widget 滚动列表） */
+  allTomorrow: WidgetCourseItem[];
 }
 
 function toISODate(date: Date): string {
@@ -89,12 +95,17 @@ export function buildWidgetCourseData(
 
   const semester = findSemesterForDate(now, semesters);
 
+  const todayCourses = buildDayCourses(now, courses, semesters);
+  const tomorrowCourses = buildDayCourses(tomorrowDate, courses, semesters);
+
   return {
     date: toISODate(now),
     tomorrowDate: toISODate(tomorrowDate),
     semesterName: semester.name,
-    today: buildDayCourses(now, courses, semesters).slice(0, 2),
-    tomorrow: buildDayCourses(tomorrowDate, courses, semesters).slice(0, 2),
+    today: todayCourses.slice(0, 2),
+    tomorrow: tomorrowCourses.slice(0, 2),
+    allToday: todayCourses,
+    allTomorrow: tomorrowCourses,
   };
 }
 
@@ -122,3 +133,18 @@ export async function loadWidgetDarkMode(): Promise<boolean> {
 }
 
 export { WIDGET_DATA_KEY, DARK_MODE_KEY };
+
+/**
+ * 从当天课程中筛选当前时间之后尚未结束的课程。
+ * 用于小 Widget「显示后续课程」模式。
+ */
+export function filterUpcomingCourses(items: WidgetCourseItem[], now: Date = new Date()): WidgetCourseItem[] {
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  return items.filter((item) => {
+    if (!item.endTime) return true; // 无结束时间的课程始终保留
+    const [h, m] = item.endTime.split(':').map(Number);
+    const endMinutes = h * 60 + m;
+    return endMinutes > currentMinutes;
+  });
+}

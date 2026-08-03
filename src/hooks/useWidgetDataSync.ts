@@ -62,6 +62,8 @@ async function updateWidget(widgetName: string): Promise<void> {
           semesterName: '假期',
           today: [],
           tomorrow: [],
+          allToday: [],
+          allTomorrow: [],
         };
         const isSmall = widgetName === 'SmallCourseWidget';
         return {

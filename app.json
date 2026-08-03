@@ -37,8 +37,8 @@
           "widgets": [
             {
               "name": "CourseWidget",
-              "label": "翱翔课表",
-              "description": "显示今明两天课程",
+              "label": "翱翔课表（显示今天所有课程）",
+              "description": "显示今明两天全部课程，可上下滚动查看",
               "minWidth": "250dp",
               "minHeight": "180dp",
               "targetCellWidth": 4,
@@ -50,8 +50,8 @@
             },
             {
               "name": "SmallCourseWidget",
-              "label": "翱翔课表(小)",
-              "description": "显示当天课程(紧凑)",
+              "label": "翱翔课表（显示后续课程）",
+              "description": "显示当天尚未开始的后续课程",
               "minWidth": "180dp",
               "minHeight": "110dp",
               "targetCellWidth": 3,
