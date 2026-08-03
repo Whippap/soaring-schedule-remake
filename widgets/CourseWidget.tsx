@@ -162,13 +162,14 @@ function LargeWidget({
               <FlexWidget
                 style={{
                   width: 16,
+                  height: 'match_parent',
                   alignItems: 'center',
                 }}
               >
                 <FlexWidget
                   style={{
-                    width: 1,
-                    flex: 1,
+                    width: 2,
+                    height: 'match_parent',
                     backgroundColor: borderColor,
                   }}
                 />
