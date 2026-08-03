@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Pressable, View, TouchableOpacity, Animated } f
 import { Text } from 'react-native-paper';
 import type { Course } from '@/types';
 import { formatTimeSlot } from '@/utils/scheduleDate';
+import { formatLocationForDisplay } from '@/utils/locationFormat';
 import { getOnColor } from '@/utils/color';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 
@@ -70,7 +71,7 @@ export function CourseDetailSheet({ course, onDismiss, onEdit, onDelete }: Props
           showsVerticalScrollIndicator={false}
         >
           <DetailRow dt={dt} label="课程代码" value={course.code} />
-          <DetailRow dt={dt} label="地点" value={course.location} />
+          <DetailRow dt={dt} label="地点" value={formatLocationForDisplay(course.location)} />
           <DetailRow dt={dt} label="教师" value={course.teacher} />
           <DetailRow dt={dt} label="学分" value={course.credits != null ? String(course.credits) : undefined} />
           <DetailRow dt={dt} label="考核方式" value={course.assessmentMethod} />

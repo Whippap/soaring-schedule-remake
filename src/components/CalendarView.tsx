@@ -27,6 +27,7 @@ import {
   toISODate,
 } from '@/utils/scheduleDate';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
+import { formatLocationForDisplay } from '@/utils/locationFormat';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { Icon } from '@/components/Icon';
 
@@ -278,7 +279,7 @@ export const CalendarView = memo(function CalendarView({ courses, semesters }: P
                       </Text>
                       {c.location ? (
                         <Text style={{ fontSize: dt.fontSize.caption, color: dt.colors.textSecondary, marginTop: 2 }}>
-                          {c.location}
+                          {formatLocationForDisplay(c.location)}
                         </Text>
                       ) : null}
                     </View>

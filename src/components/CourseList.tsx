@@ -17,6 +17,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { Course, Semester } from '@/types';
 import { formatTimeSlot } from '@/utils/scheduleDate';
+import { formatLocationForDisplay } from '@/utils/locationFormat';
 import { useCourseStore } from '@/stores/courseStore';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -152,8 +153,8 @@ function AnimatedCard({
               {course.location ? (
                 <View style={[styles.metaPill, { backgroundColor: dt.colors.surfaceAlt }]}>
                   <Icon name="location" size={11} color={dt.colors.textSecondary} />
-                  <Text style={[styles.metaText, { color: dt.colors.textSecondary }]}>
-                    {course.location.length > 20 ? course.location.slice(0, 20) + '...' : course.location}
+                  <Text style={[styles.metaText, { color: dt.colors.textSecondary }]} numberOfLines={1}>
+                    {formatLocationForDisplay(course.location)}
                   </Text>
                 </View>
               ) : null}

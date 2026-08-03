@@ -7,6 +7,7 @@ import {
   matchesRepeatRule,
   formatSections,
 } from './scheduleDate';
+import { formatLocationForDisplay } from './locationFormat';
 
 const WIDGET_DATA_KEY = '@soaring_schedule:widget_data';
 const DARK_MODE_KEY = '@soaring_schedule:dark_mode';
@@ -72,7 +73,7 @@ function buildDayCourses(
       items.push({
         id: `${course.id}-${slot.dayOfWeek}`,
         name: course.name,
-        location: course.location,
+        location: formatLocationForDisplay(course.location),
         color: course.color,
         sectionRange: formatSections(sorted),
         startTime,

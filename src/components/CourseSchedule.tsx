@@ -23,6 +23,7 @@ import { useCourseStore } from '@/stores/courseStore';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { getOnColor } from '@/utils/color';
 import { CourseDetailSheet } from '@/components/CourseDetailSheet';
+import { formatLocationForDisplay } from '@/utils/locationFormat';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ROW_HEIGHT = 52;
@@ -154,15 +155,6 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
         },
       },
     ]);
-  };
-
-  const stripCampusPrefix = (location?: string): string | undefined => {
-    if (!location) return undefined;
-    const dashIndex = location.indexOf('-');
-    if (dashIndex > 0 && /校区$/.test(location.slice(0, dashIndex))) {
-      return location.slice(dashIndex + 1);
-    }
-    return location;
   };
 
   const currentDateStr = format(anchor, 'M月d日');
@@ -355,7 +347,7 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
                           ]}
                           numberOfLines={1}
                         >
-                          {stripCampusPrefix(block.course.location)}
+                          {formatLocationForDisplay(block.course.location)}
                         </Text>
                       ) : null}
                     </TouchableOpacity>

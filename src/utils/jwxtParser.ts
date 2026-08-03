@@ -2,6 +2,7 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import type { Course, SectionTime, Semester, TimeSlot } from '@/types';
 import { AssessmentMethod, IMPORT_COLORS, RepeatRule } from '@/types';
+import { formatLocationForDisplay } from '@/utils/locationFormat';
 
 export interface RawCourse {
   name: string;
@@ -369,7 +370,7 @@ export function convertToCourses(
       semesterId,
       timeSlots,
       code: raw.code || undefined,
-      location: raw.location || undefined,
+      location: formatLocationForDisplay(raw.location) || undefined,
       credits: raw.credits,
       teacher: raw.teacher || undefined,
       assessmentMethod,
