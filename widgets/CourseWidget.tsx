@@ -65,7 +65,13 @@ function SmallWidget({
     >
       {/* Vertical title on the left */}
       <FlexWidget
-        style={{ flexDirection: 'column', alignItems: 'center', marginRight: 8 }}
+        style={{
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: 'match_parent',
+          marginRight: 8,
+        }}
       >
         <TextWidget
           text="今"
@@ -85,7 +91,7 @@ function SmallWidget({
         />
       </FlexWidget>
       {upcoming.length === 0 ? (
-        <FlexWidget style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <FlexWidget style={{ flex: 1, height: 'match_parent', alignItems: 'center', justifyContent: 'center' }}>
           <TextWidget
             text="今天没有课了"
             style={{ fontSize: 13, color: subColor, textAlign: 'center' }}
@@ -169,7 +175,21 @@ function LargeWidget({
             >
               {/* Today column */}
               <FlexWidget style={{ width: 0, flex: 1, flexDirection: 'column' }}>
-                {snapshot.allToday[i] ? (
+                {snapshot.allToday.length === 0 && i === 0 ? (
+                  <FlexWidget
+                    clickAction="WIDGET_REFRESH"
+                    style={{
+                      height: 'match_parent',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <TextWidget
+                      text="今天没有课了"
+                      style={{ fontSize: 12, color: subColor }}
+                    />
+                  </FlexWidget>
+                ) : snapshot.allToday[i] ? (
                   <CourseRow
                     item={snapshot.allToday[i]}
                     textColor={textColor}
@@ -199,7 +219,21 @@ function LargeWidget({
 
               {/* Tomorrow column */}
               <FlexWidget style={{ width: 0, flex: 1, flexDirection: 'column' }}>
-                {snapshot.allTomorrow[i] ? (
+                {snapshot.allTomorrow.length === 0 && i === 0 ? (
+                  <FlexWidget
+                    clickAction="WIDGET_REFRESH"
+                    style={{
+                      height: 'match_parent',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <TextWidget
+                      text="明天没有课了"
+                      style={{ fontSize: 12, color: subColor }}
+                    />
+                  </FlexWidget>
+                ) : snapshot.allTomorrow[i] ? (
                   <CourseRow
                     item={snapshot.allTomorrow[i]}
                     textColor={textColor}
