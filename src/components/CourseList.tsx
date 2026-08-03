@@ -1,4 +1,4 @@
-import { memo, useMemo, useState, useCallback, useEffect } from 'react';
+import { memo, useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import {
   FlatList,
   RefreshControl,
@@ -59,7 +59,7 @@ function AnimatedCard({
   // Trigger entrance animation
   useEffect(() => {
     if (reduced) return;
-    const delay = index * 50;
+    const delay = Math.min(index * 50, 300);
     // eslint-disable-next-line react-hooks/immutability
     opacity.value = withDelay(delay, withSpring(1, { damping: 20, stiffness: 150 }));
     // eslint-disable-next-line react-hooks/immutability
@@ -212,6 +212,29 @@ function ListSeparator() {
 const CourseListInner = memo(function CourseList({ semesters, currentSemesterId, onEdit, onDetail }: Props) {
   const dt = useDesignTokens();
   const reduced = useReducedMotion();
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const effectiveReduced = reduced || isScrolling;
+
+  const handleScrollBeginDrag = useCallback(() => {
+    if (scrollEndTimerRef.current) {
+      clearTimeout(scrollEndTimerRef.current);
+      scrollEndTimerRef.current = null;
+    }
+    setIsScrolling(true);
+  }, []);
+
+  const handleScrollEndDrag = useCallback(() => {
+    scrollEndTimerRef.current = setTimeout(() => setIsScrolling(false), 100);
+  }, []);
+
+  const handleMomentumScrollEnd = useCallback(() => {
+    if (scrollEndTimerRef.current) {
+      clearTimeout(scrollEndTimerRef.current);
+      scrollEndTimerRef.current = null;
+    }
+    setIsScrolling(false);
+  }, []);
   const courses = useCourseStore((s) => s.courses);
   const deleteCourse = useCourseStore((s) => s.deleteCourse);
   const [manualFilterId, setManualFilterId] = useState<string | null>(null);
@@ -251,11 +274,11 @@ const CourseListInner = memo(function CourseList({ semesters, currentSemesterId,
         onEdit={onEdit}
         onDelete={handleDelete}
         dt={dt}
-        reduced={reduced}
+        reduced={effectiveReduced}
         onDetail={onDetail}
       />
     ),
-    [onEdit, dt, handleDelete, reduced, onDetail],
+    [onEdit, dt, handleDelete, effectiveReduced, onDetail],
   );
 
   return (
@@ -309,6 +332,9 @@ const CourseListInner = memo(function CourseList({ semesters, currentSemesterId,
           />
         }
         ItemSeparatorComponent={ListSeparator}
+        onScrollBeginDrag={handleScrollBeginDrag}
+        onScrollEndDrag={handleScrollEndDrag}
+        onMomentumScrollEnd={handleMomentumScrollEnd}
         removeClippedSubviews={false}
         maxToRenderPerBatch={10}
         windowSize={7}
