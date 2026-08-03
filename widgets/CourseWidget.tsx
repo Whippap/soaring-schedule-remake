@@ -117,7 +117,7 @@ function LargeWidget({
       }}
     >
       {/* Fixed header */}
-      <FlexWidget style={{ flexDirection: 'row', marginBottom: 4 }}>
+      <FlexWidget style={{ width: 'match_parent', flexDirection: 'row', marginBottom: 4 }}>
         <FlexWidget style={{ width: 0, flex: 1 }}>
           <TextWidget
             text="今天"
