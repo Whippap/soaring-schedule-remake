@@ -131,6 +131,7 @@ function LargeWidget({
 }) {
   const todayEmpty = snapshot.allToday.length === 0;
   const tomorrowEmpty = snapshot.allTomorrow.length === 0;
+  const maxRows = Math.max(snapshot.allToday.length, snapshot.allTomorrow.length, 1);
 
   return (
     <FlexWidget
@@ -161,68 +162,87 @@ function LargeWidget({
         </FlexWidget>
       </FlexWidget>
 
-      {/* Content — two independent columns */}
-      <FlexWidget style={{ flex: 1, width: 'match_parent', flexDirection: 'row' }}>
-        {/* Today */}
-        <FlexWidget style={{ width: 0, flex: 1, flexDirection: 'column' }}>
-          {todayEmpty ? (
-            <FlexWidget
-              style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-            >
+      {/* Empty-state indicators — shown above ListWidget when a day has no courses */}
+      {todayEmpty || tomorrowEmpty ? (
+        <FlexWidget
+          style={{ width: 'match_parent', flexDirection: 'row', marginBottom: 4 }}
+        >
+          <FlexWidget style={{ width: 0, flex: 1, alignItems: 'center' }}>
+            {todayEmpty ? (
               <TextWidget
                 text="今天没有课了"
-                style={{ fontSize: 12, color: subColor }}
+                style={{ fontSize: 11, color: subColor }}
               />
-            </FlexWidget>
-          ) : (
-            <ListWidget>
-              {snapshot.allToday.map((item) => (
-                <FlexWidget
-                  key={item.id}
-                  clickAction="WIDGET_REFRESH"
-                  style={{ width: 'match_parent', paddingVertical: 4 }}
-                >
-                  <CourseRow item={item} textColor={textColor} subColor={subColor} />
-                </FlexWidget>
-              ))}
-            </ListWidget>
-          )}
-        </FlexWidget>
-
-        {/* Divider */}
-        <FlexWidget
-          style={{ width: 16, height: 'match_parent', alignItems: 'center' }}
-        >
-          <FlexWidget
-            style={{ width: 2, height: 'match_parent', backgroundColor: borderColor }}
-          />
-        </FlexWidget>
-
-        {/* Tomorrow */}
-        <FlexWidget style={{ width: 0, flex: 1, flexDirection: 'column' }}>
-          {tomorrowEmpty ? (
-            <FlexWidget
-              style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-            >
+            ) : (
+              <FlexWidget style={{ height: 0 }} />
+            )}
+          </FlexWidget>
+          <FlexWidget style={{ width: 16 }} />
+          <FlexWidget style={{ width: 0, flex: 1, alignItems: 'center' }}>
+            {tomorrowEmpty ? (
               <TextWidget
                 text="明天没有课了"
-                style={{ fontSize: 12, color: subColor }}
+                style={{ fontSize: 11, color: subColor }}
               />
-            </FlexWidget>
-          ) : (
-            <ListWidget>
-              {snapshot.allTomorrow.map((item) => (
-                <FlexWidget
-                  key={item.id}
-                  clickAction="WIDGET_REFRESH"
-                  style={{ width: 'match_parent', paddingVertical: 4 }}
-                >
-                  <CourseRow item={item} textColor={textColor} subColor={subColor} />
-                </FlexWidget>
-              ))}
-            </ListWidget>
-          )}
+            ) : (
+              <FlexWidget style={{ height: 0 }} />
+            )}
+          </FlexWidget>
         </FlexWidget>
+      ) : (
+        <FlexWidget style={{ height: 0 }} />
+      )}
+
+      {/* Scrollable course list — single shared ListWidget (original structure) */}
+      <FlexWidget style={{ flex: 1, width: 'match_parent' }}>
+        <ListWidget>
+          {Array.from({ length: maxRows }, (_, i) => (
+            <FlexWidget
+              key={i}
+              clickAction="WIDGET_REFRESH"
+              style={{
+                width: 'match_parent',
+                flexDirection: 'row',
+                paddingVertical: 4,
+              }}
+            >
+              {/* Today column */}
+              <FlexWidget style={{ width: 0, flex: 1, flexDirection: 'column' }}>
+                {snapshot.allToday[i] ? (
+                  <CourseRow
+                    item={snapshot.allToday[i]}
+                    textColor={textColor}
+                    subColor={subColor}
+                  />
+                ) : (
+                  <FlexWidget style={{ height: 1 }} />
+                )}
+              </FlexWidget>
+
+              {/* Divider */}
+              <FlexWidget
+                style={{ width: 16, height: 'match_parent', alignItems: 'center' }}
+              >
+                <FlexWidget
+                  style={{ width: 2, height: 'match_parent', backgroundColor: borderColor }}
+                />
+              </FlexWidget>
+
+              {/* Tomorrow column */}
+              <FlexWidget style={{ width: 0, flex: 1, flexDirection: 'column' }}>
+                {snapshot.allTomorrow[i] ? (
+                  <CourseRow
+                    item={snapshot.allTomorrow[i]}
+                    textColor={textColor}
+                    subColor={subColor}
+                  />
+                ) : (
+                  <FlexWidget style={{ height: 1 }} />
+                )}
+              </FlexWidget>
+            </FlexWidget>
+          ))}
+        </ListWidget>
       </FlexWidget>
     </FlexWidget>
   );
