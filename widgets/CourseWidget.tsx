@@ -34,7 +34,7 @@ export function CourseWidget({ snapshot, isDark, variant = 'large' }: Props) {
 
 /* ──────────── Small Widget ──────────── */
 
-const SMALL_MAX_VISIBLE = 2;
+const SMALL_MAX_VISIBLE = 3;
 
 function SmallWidget({
   snapshot,
@@ -63,6 +63,10 @@ function SmallWidget({
         flexDirection: 'column',
       }}
     >
+      <TextWidget
+        text="今日课程"
+        style={{ fontSize: 12, color: subColor, fontWeight: 'bold', marginBottom: 6 }}
+      />
       {upcoming.length === 0 ? (
         <FlexWidget style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <TextWidget
