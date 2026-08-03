@@ -19,6 +19,7 @@ export function CourseWidget({ snapshot, isDark, variant = 'large' }: Props) {
   if (variant === 'small') {
     return (
       <FlexWidget
+        clickAction="WIDGET_REFRESH"
         style={{
           width: 'match_parent',
           height: 'match_parent',
@@ -36,6 +37,7 @@ export function CourseWidget({ snapshot, isDark, variant = 'large' }: Props) {
   // large variant: today + tomorrow with vertical divider
   return (
     <FlexWidget
+      clickAction="WIDGET_REFRESH"
       style={{
         width: 'match_parent',
         height: 'match_parent',

@@ -46,7 +46,7 @@
               "maxResizeWidth": "250dp",
               "maxResizeHeight": "180dp",
               "resizeMode": "none",
-              "updatePeriodMillis": 1800000
+              "updatePeriodMillis": 0
             },
             {
               "name": "SmallCourseWidget",
@@ -59,12 +59,13 @@
               "maxResizeWidth": "180dp",
               "maxResizeHeight": "110dp",
               "resizeMode": "none",
-              "updatePeriodMillis": 1800000
+              "updatePeriodMillis": 0
             }
           ]
         }
       ],
       "./plugins/withHonorWidget.js",
+      "./plugins/withWidgetConfig.js",
       "expo-sharing"
     ],
     "experiments": {
