@@ -51,3 +51,4 @@ REQUIREMENTS.md
 *.apk
 document/
 .claude/
+.vscode/
