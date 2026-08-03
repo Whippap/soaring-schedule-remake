@@ -1,0 +1,1712 @@
+{
+  "version": "2.0",
+  "exportDate": "2026-08-03T00:00:00.000Z",
+  "courses": [
+    {
+      "id": "test-周一-1",
+      "name": "周一第1节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            1
+          ]
+        }
+      ],
+      "location": "教西A201",
+      "color": "#E53935",
+      "teacher": "教师周一1"
+    },
+    {
+      "id": "test-周一-2",
+      "name": "周一第2节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            2
+          ]
+        }
+      ],
+      "location": "教西A301",
+      "color": "#1E88E5",
+      "teacher": "教师周一2"
+    },
+    {
+      "id": "test-周一-3",
+      "name": "周一第3节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            3
+          ]
+        }
+      ],
+      "location": "教东B101",
+      "color": "#43A047",
+      "teacher": "教师周一3"
+    },
+    {
+      "id": "test-周一-4",
+      "name": "周一第4节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            4
+          ]
+        }
+      ],
+      "location": "教东B202",
+      "color": "#FB8C00",
+      "teacher": "教师周一4"
+    },
+    {
+      "id": "test-周一-5",
+      "name": "周一第5节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            5
+          ]
+        }
+      ],
+      "location": "教东C303",
+      "color": "#8E24AA",
+      "teacher": "教师周一5"
+    },
+    {
+      "id": "test-周一-6",
+      "name": "周一第6节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            6
+          ]
+        }
+      ],
+      "location": "实验大楼A401",
+      "color": "#00ACC1",
+      "teacher": "教师周一6"
+    },
+    {
+      "id": "test-周一-7",
+      "name": "周一第7节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            7
+          ]
+        }
+      ],
+      "location": "教西D102",
+      "color": "#FFB300",
+      "teacher": "教师周一7"
+    },
+    {
+      "id": "test-周一-8",
+      "name": "周一第8节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            8
+          ]
+        }
+      ],
+      "location": "教东B308",
+      "color": "#3949AB",
+      "teacher": "教师周一8"
+    },
+    {
+      "id": "test-周一-9",
+      "name": "周一第9节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            9
+          ]
+        }
+      ],
+      "location": "综合楼501",
+      "color": "#E53935",
+      "teacher": "教师周一9"
+    },
+    {
+      "id": "test-周一-10",
+      "name": "周一第10节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            10
+          ]
+        }
+      ],
+      "location": "教西A105",
+      "color": "#1E88E5",
+      "teacher": "教师周一10"
+    },
+    {
+      "id": "test-周一-11",
+      "name": "周一第11节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            11
+          ]
+        }
+      ],
+      "location": "教东C205",
+      "color": "#43A047",
+      "teacher": "教师周一11"
+    },
+    {
+      "id": "test-周一-12",
+      "name": "周一第12节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            12
+          ]
+        }
+      ],
+      "location": "实验大楼B301",
+      "color": "#FB8C00",
+      "teacher": "教师周一12"
+    },
+    {
+      "id": "test-周一-13",
+      "name": "周一第13节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 1,
+          "classSections": [
+            13
+          ]
+        }
+      ],
+      "location": "教西A406",
+      "color": "#8E24AA",
+      "teacher": "教师周一13"
+    },
+    {
+      "id": "test-周二-1",
+      "name": "周二第1节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            1
+          ]
+        }
+      ],
+      "location": "教西A201",
+      "color": "#E53935",
+      "teacher": "教师周二1"
+    },
+    {
+      "id": "test-周二-2",
+      "name": "周二第2节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            2
+          ]
+        }
+      ],
+      "location": "教西A301",
+      "color": "#1E88E5",
+      "teacher": "教师周二2"
+    },
+    {
+      "id": "test-周二-3",
+      "name": "周二第3节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            3
+          ]
+        }
+      ],
+      "location": "教东B101",
+      "color": "#43A047",
+      "teacher": "教师周二3"
+    },
+    {
+      "id": "test-周二-4",
+      "name": "周二第4节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            4
+          ]
+        }
+      ],
+      "location": "教东B202",
+      "color": "#FB8C00",
+      "teacher": "教师周二4"
+    },
+    {
+      "id": "test-周二-5",
+      "name": "周二第5节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            5
+          ]
+        }
+      ],
+      "location": "教东C303",
+      "color": "#8E24AA",
+      "teacher": "教师周二5"
+    },
+    {
+      "id": "test-周二-6",
+      "name": "周二第6节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            6
+          ]
+        }
+      ],
+      "location": "实验大楼A401",
+      "color": "#00ACC1",
+      "teacher": "教师周二6"
+    },
+    {
+      "id": "test-周二-7",
+      "name": "周二第7节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            7
+          ]
+        }
+      ],
+      "location": "教西D102",
+      "color": "#FFB300",
+      "teacher": "教师周二7"
+    },
+    {
+      "id": "test-周二-8",
+      "name": "周二第8节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            8
+          ]
+        }
+      ],
+      "location": "教东B308",
+      "color": "#3949AB",
+      "teacher": "教师周二8"
+    },
+    {
+      "id": "test-周二-9",
+      "name": "周二第9节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            9
+          ]
+        }
+      ],
+      "location": "综合楼501",
+      "color": "#E53935",
+      "teacher": "教师周二9"
+    },
+    {
+      "id": "test-周二-10",
+      "name": "周二第10节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            10
+          ]
+        }
+      ],
+      "location": "教西A105",
+      "color": "#1E88E5",
+      "teacher": "教师周二10"
+    },
+    {
+      "id": "test-周二-11",
+      "name": "周二第11节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            11
+          ]
+        }
+      ],
+      "location": "教东C205",
+      "color": "#43A047",
+      "teacher": "教师周二11"
+    },
+    {
+      "id": "test-周二-12",
+      "name": "周二第12节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            12
+          ]
+        }
+      ],
+      "location": "实验大楼B301",
+      "color": "#FB8C00",
+      "teacher": "教师周二12"
+    },
+    {
+      "id": "test-周二-13",
+      "name": "周二第13节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 2,
+          "classSections": [
+            13
+          ]
+        }
+      ],
+      "location": "教西A406",
+      "color": "#8E24AA",
+      "teacher": "教师周二13"
+    },
+    {
+      "id": "test-周三-1",
+      "name": "周三第1节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            1
+          ]
+        }
+      ],
+      "location": "教西A201",
+      "color": "#E53935",
+      "teacher": "教师周三1"
+    },
+    {
+      "id": "test-周三-2",
+      "name": "周三第2节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            2
+          ]
+        }
+      ],
+      "location": "教西A301",
+      "color": "#1E88E5",
+      "teacher": "教师周三2"
+    },
+    {
+      "id": "test-周三-3",
+      "name": "周三第3节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            3
+          ]
+        }
+      ],
+      "location": "教东B101",
+      "color": "#43A047",
+      "teacher": "教师周三3"
+    },
+    {
+      "id": "test-周三-4",
+      "name": "周三第4节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            4
+          ]
+        }
+      ],
+      "location": "教东B202",
+      "color": "#FB8C00",
+      "teacher": "教师周三4"
+    },
+    {
+      "id": "test-周三-5",
+      "name": "周三第5节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            5
+          ]
+        }
+      ],
+      "location": "教东C303",
+      "color": "#8E24AA",
+      "teacher": "教师周三5"
+    },
+    {
+      "id": "test-周三-6",
+      "name": "周三第6节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            6
+          ]
+        }
+      ],
+      "location": "实验大楼A401",
+      "color": "#00ACC1",
+      "teacher": "教师周三6"
+    },
+    {
+      "id": "test-周三-7",
+      "name": "周三第7节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            7
+          ]
+        }
+      ],
+      "location": "教西D102",
+      "color": "#FFB300",
+      "teacher": "教师周三7"
+    },
+    {
+      "id": "test-周三-8",
+      "name": "周三第8节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            8
+          ]
+        }
+      ],
+      "location": "教东B308",
+      "color": "#3949AB",
+      "teacher": "教师周三8"
+    },
+    {
+      "id": "test-周三-9",
+      "name": "周三第9节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            9
+          ]
+        }
+      ],
+      "location": "综合楼501",
+      "color": "#E53935",
+      "teacher": "教师周三9"
+    },
+    {
+      "id": "test-周三-10",
+      "name": "周三第10节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            10
+          ]
+        }
+      ],
+      "location": "教西A105",
+      "color": "#1E88E5",
+      "teacher": "教师周三10"
+    },
+    {
+      "id": "test-周三-11",
+      "name": "周三第11节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            11
+          ]
+        }
+      ],
+      "location": "教东C205",
+      "color": "#43A047",
+      "teacher": "教师周三11"
+    },
+    {
+      "id": "test-周三-12",
+      "name": "周三第12节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            12
+          ]
+        }
+      ],
+      "location": "实验大楼B301",
+      "color": "#FB8C00",
+      "teacher": "教师周三12"
+    },
+    {
+      "id": "test-周三-13",
+      "name": "周三第13节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 3,
+          "classSections": [
+            13
+          ]
+        }
+      ],
+      "location": "教西A406",
+      "color": "#8E24AA",
+      "teacher": "教师周三13"
+    },
+    {
+      "id": "test-周四-1",
+      "name": "周四第1节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            1
+          ]
+        }
+      ],
+      "location": "教西A201",
+      "color": "#E53935",
+      "teacher": "教师周四1"
+    },
+    {
+      "id": "test-周四-2",
+      "name": "周四第2节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            2
+          ]
+        }
+      ],
+      "location": "教西A301",
+      "color": "#1E88E5",
+      "teacher": "教师周四2"
+    },
+    {
+      "id": "test-周四-3",
+      "name": "周四第3节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            3
+          ]
+        }
+      ],
+      "location": "教东B101",
+      "color": "#43A047",
+      "teacher": "教师周四3"
+    },
+    {
+      "id": "test-周四-4",
+      "name": "周四第4节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            4
+          ]
+        }
+      ],
+      "location": "教东B202",
+      "color": "#FB8C00",
+      "teacher": "教师周四4"
+    },
+    {
+      "id": "test-周四-5",
+      "name": "周四第5节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            5
+          ]
+        }
+      ],
+      "location": "教东C303",
+      "color": "#8E24AA",
+      "teacher": "教师周四5"
+    },
+    {
+      "id": "test-周四-6",
+      "name": "周四第6节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            6
+          ]
+        }
+      ],
+      "location": "实验大楼A401",
+      "color": "#00ACC1",
+      "teacher": "教师周四6"
+    },
+    {
+      "id": "test-周四-7",
+      "name": "周四第7节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            7
+          ]
+        }
+      ],
+      "location": "教西D102",
+      "color": "#FFB300",
+      "teacher": "教师周四7"
+    },
+    {
+      "id": "test-周四-8",
+      "name": "周四第8节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            8
+          ]
+        }
+      ],
+      "location": "教东B308",
+      "color": "#3949AB",
+      "teacher": "教师周四8"
+    },
+    {
+      "id": "test-周四-9",
+      "name": "周四第9节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            9
+          ]
+        }
+      ],
+      "location": "综合楼501",
+      "color": "#E53935",
+      "teacher": "教师周四9"
+    },
+    {
+      "id": "test-周四-10",
+      "name": "周四第10节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            10
+          ]
+        }
+      ],
+      "location": "教西A105",
+      "color": "#1E88E5",
+      "teacher": "教师周四10"
+    },
+    {
+      "id": "test-周四-11",
+      "name": "周四第11节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            11
+          ]
+        }
+      ],
+      "location": "教东C205",
+      "color": "#43A047",
+      "teacher": "教师周四11"
+    },
+    {
+      "id": "test-周四-12",
+      "name": "周四第12节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            12
+          ]
+        }
+      ],
+      "location": "实验大楼B301",
+      "color": "#FB8C00",
+      "teacher": "教师周四12"
+    },
+    {
+      "id": "test-周四-13",
+      "name": "周四第13节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 4,
+          "classSections": [
+            13
+          ]
+        }
+      ],
+      "location": "教西A406",
+      "color": "#8E24AA",
+      "teacher": "教师周四13"
+    },
+    {
+      "id": "test-周五-1",
+      "name": "周五第1节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            1
+          ]
+        }
+      ],
+      "location": "教西A201",
+      "color": "#E53935",
+      "teacher": "教师周五1"
+    },
+    {
+      "id": "test-周五-2",
+      "name": "周五第2节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            2
+          ]
+        }
+      ],
+      "location": "教西A301",
+      "color": "#1E88E5",
+      "teacher": "教师周五2"
+    },
+    {
+      "id": "test-周五-3",
+      "name": "周五第3节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            3
+          ]
+        }
+      ],
+      "location": "教东B101",
+      "color": "#43A047",
+      "teacher": "教师周五3"
+    },
+    {
+      "id": "test-周五-4",
+      "name": "周五第4节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            4
+          ]
+        }
+      ],
+      "location": "教东B202",
+      "color": "#FB8C00",
+      "teacher": "教师周五4"
+    },
+    {
+      "id": "test-周五-5",
+      "name": "周五第5节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            5
+          ]
+        }
+      ],
+      "location": "教东C303",
+      "color": "#8E24AA",
+      "teacher": "教师周五5"
+    },
+    {
+      "id": "test-周五-6",
+      "name": "周五第6节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            6
+          ]
+        }
+      ],
+      "location": "实验大楼A401",
+      "color": "#00ACC1",
+      "teacher": "教师周五6"
+    },
+    {
+      "id": "test-周五-7",
+      "name": "周五第7节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            7
+          ]
+        }
+      ],
+      "location": "教西D102",
+      "color": "#FFB300",
+      "teacher": "教师周五7"
+    },
+    {
+      "id": "test-周五-8",
+      "name": "周五第8节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            8
+          ]
+        }
+      ],
+      "location": "教东B308",
+      "color": "#3949AB",
+      "teacher": "教师周五8"
+    },
+    {
+      "id": "test-周五-9",
+      "name": "周五第9节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            9
+          ]
+        }
+      ],
+      "location": "综合楼501",
+      "color": "#E53935",
+      "teacher": "教师周五9"
+    },
+    {
+      "id": "test-周五-10",
+      "name": "周五第10节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            10
+          ]
+        }
+      ],
+      "location": "教西A105",
+      "color": "#1E88E5",
+      "teacher": "教师周五10"
+    },
+    {
+      "id": "test-周五-11",
+      "name": "周五第11节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            11
+          ]
+        }
+      ],
+      "location": "教东C205",
+      "color": "#43A047",
+      "teacher": "教师周五11"
+    },
+    {
+      "id": "test-周五-12",
+      "name": "周五第12节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            12
+          ]
+        }
+      ],
+      "location": "实验大楼B301",
+      "color": "#FB8C00",
+      "teacher": "教师周五12"
+    },
+    {
+      "id": "test-周五-13",
+      "name": "周五第13节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 5,
+          "classSections": [
+            13
+          ]
+        }
+      ],
+      "location": "教西A406",
+      "color": "#8E24AA",
+      "teacher": "教师周五13"
+    },
+    {
+      "id": "test-周六-1",
+      "name": "周六第1节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            1
+          ]
+        }
+      ],
+      "location": "教西A201",
+      "color": "#E53935",
+      "teacher": "教师周六1"
+    },
+    {
+      "id": "test-周六-2",
+      "name": "周六第2节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            2
+          ]
+        }
+      ],
+      "location": "教西A301",
+      "color": "#1E88E5",
+      "teacher": "教师周六2"
+    },
+    {
+      "id": "test-周六-3",
+      "name": "周六第3节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            3
+          ]
+        }
+      ],
+      "location": "教东B101",
+      "color": "#43A047",
+      "teacher": "教师周六3"
+    },
+    {
+      "id": "test-周六-4",
+      "name": "周六第4节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            4
+          ]
+        }
+      ],
+      "location": "教东B202",
+      "color": "#FB8C00",
+      "teacher": "教师周六4"
+    },
+    {
+      "id": "test-周六-5",
+      "name": "周六第5节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            5
+          ]
+        }
+      ],
+      "location": "教东C303",
+      "color": "#8E24AA",
+      "teacher": "教师周六5"
+    },
+    {
+      "id": "test-周六-6",
+      "name": "周六第6节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            6
+          ]
+        }
+      ],
+      "location": "实验大楼A401",
+      "color": "#00ACC1",
+      "teacher": "教师周六6"
+    },
+    {
+      "id": "test-周六-7",
+      "name": "周六第7节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            7
+          ]
+        }
+      ],
+      "location": "教西D102",
+      "color": "#FFB300",
+      "teacher": "教师周六7"
+    },
+    {
+      "id": "test-周六-8",
+      "name": "周六第8节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            8
+          ]
+        }
+      ],
+      "location": "教东B308",
+      "color": "#3949AB",
+      "teacher": "教师周六8"
+    },
+    {
+      "id": "test-周六-9",
+      "name": "周六第9节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            9
+          ]
+        }
+      ],
+      "location": "综合楼501",
+      "color": "#E53935",
+      "teacher": "教师周六9"
+    },
+    {
+      "id": "test-周六-10",
+      "name": "周六第10节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            10
+          ]
+        }
+      ],
+      "location": "教西A105",
+      "color": "#1E88E5",
+      "teacher": "教师周六10"
+    },
+    {
+      "id": "test-周六-11",
+      "name": "周六第11节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            11
+          ]
+        }
+      ],
+      "location": "教东C205",
+      "color": "#43A047",
+      "teacher": "教师周六11"
+    },
+    {
+      "id": "test-周六-12",
+      "name": "周六第12节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            12
+          ]
+        }
+      ],
+      "location": "实验大楼B301",
+      "color": "#FB8C00",
+      "teacher": "教师周六12"
+    },
+    {
+      "id": "test-周六-13",
+      "name": "周六第13节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 6,
+          "classSections": [
+            13
+          ]
+        }
+      ],
+      "location": "教西A406",
+      "color": "#8E24AA",
+      "teacher": "教师周六13"
+    },
+    {
+      "id": "test-周日-1",
+      "name": "周日第1节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            1
+          ]
+        }
+      ],
+      "location": "教西A201",
+      "color": "#E53935",
+      "teacher": "教师周日1"
+    },
+    {
+      "id": "test-周日-2",
+      "name": "周日第2节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            2
+          ]
+        }
+      ],
+      "location": "教西A301",
+      "color": "#1E88E5",
+      "teacher": "教师周日2"
+    },
+    {
+      "id": "test-周日-3",
+      "name": "周日第3节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            3
+          ]
+        }
+      ],
+      "location": "教东B101",
+      "color": "#43A047",
+      "teacher": "教师周日3"
+    },
+    {
+      "id": "test-周日-4",
+      "name": "周日第4节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            4
+          ]
+        }
+      ],
+      "location": "教东B202",
+      "color": "#FB8C00",
+      "teacher": "教师周日4"
+    },
+    {
+      "id": "test-周日-5",
+      "name": "周日第5节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            5
+          ]
+        }
+      ],
+      "location": "教东C303",
+      "color": "#8E24AA",
+      "teacher": "教师周日5"
+    },
+    {
+      "id": "test-周日-6",
+      "name": "周日第6节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            6
+          ]
+        }
+      ],
+      "location": "实验大楼A401",
+      "color": "#00ACC1",
+      "teacher": "教师周日6"
+    },
+    {
+      "id": "test-周日-7",
+      "name": "周日第7节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            7
+          ]
+        }
+      ],
+      "location": "教西D102",
+      "color": "#FFB300",
+      "teacher": "教师周日7"
+    },
+    {
+      "id": "test-周日-8",
+      "name": "周日第8节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            8
+          ]
+        }
+      ],
+      "location": "教东B308",
+      "color": "#3949AB",
+      "teacher": "教师周日8"
+    },
+    {
+      "id": "test-周日-9",
+      "name": "周日第9节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            9
+          ]
+        }
+      ],
+      "location": "综合楼501",
+      "color": "#E53935",
+      "teacher": "教师周日9"
+    },
+    {
+      "id": "test-周日-10",
+      "name": "周日第10节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            10
+          ]
+        }
+      ],
+      "location": "教西A105",
+      "color": "#1E88E5",
+      "teacher": "教师周日10"
+    },
+    {
+      "id": "test-周日-11",
+      "name": "周日第11节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            11
+          ]
+        }
+      ],
+      "location": "教东C205",
+      "color": "#43A047",
+      "teacher": "教师周日11"
+    },
+    {
+      "id": "test-周日-12",
+      "name": "周日第12节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            12
+          ]
+        }
+      ],
+      "location": "实验大楼B301",
+      "color": "#FB8C00",
+      "teacher": "教师周日12"
+    },
+    {
+      "id": "test-周日-13",
+      "name": "周日第13节",
+      "semesterId": "test-semester-2026",
+      "timeSlots": [
+        {
+          "weekRange": "1-53",
+          "repeatRule": "",
+          "dayOfWeek": 7,
+          "classSections": [
+            13
+          ]
+        }
+      ],
+      "location": "教西A406",
+      "color": "#8E24AA",
+      "teacher": "教师周日13"
+    }
+  ],
+  "settings": {
+    "semesters": [
+      {
+        "id": "test-semester-2026",
+        "name": "2026年测试学期",
+        "startDate": "2026-01-01",
+        "endDate": "2026-12-31",
+        "weekCount": 53,
+        "sectionCount": 13,
+        "sectionTimes": [
+          {
+            "start": "08:30",
+            "end": "09:15"
+          },
+          {
+            "start": "09:25",
+            "end": "10:10"
+          },
+          {
+            "start": "10:30",
+            "end": "11:15"
+          },
+          {
+            "start": "11:25",
+            "end": "12:10"
+          },
+          {
+            "start": "12:20",
+            "end": "13:05"
+          },
+          {
+            "start": "13:05",
+            "end": "13:50"
+          },
+          {
+            "start": "14:00",
+            "end": "14:45"
+          },
+          {
+            "start": "14:55",
+            "end": "15:40"
+          },
+          {
+            "start": "15:55",
+            "end": "16:40"
+          },
+          {
+            "start": "16:55",
+            "end": "17:40"
+          },
+          {
+            "start": "19:00",
+            "end": "19:45"
+          },
+          {
+            "start": "19:55",
+            "end": "20:40"
+          },
+          {
+            "start": "20:40",
+            "end": "21:25"
+          }
+        ]
+      }
+    ],
+    "themeColor": "#0D9488",
+    "darkMode": false
+  }
+}
