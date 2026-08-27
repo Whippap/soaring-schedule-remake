@@ -871,7 +871,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - Campus time presets now live in `src/utils/campusTimes.ts`; `TimeTableEditor.tsx` (unused) still holds its own copy.
 ```
 
-- [ ] **步骤 2：Commit**
+- [ ] **步骤 2：Commit（本仓库将 CLAUDE.md 列入 .gitignore，执行时验证：`git check-ignore CLAUDE.md` 有输出则跳过提交，仅保留落盘修改）**
 
 ```bash
 git add CLAUDE.md
