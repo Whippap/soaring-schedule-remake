@@ -188,16 +188,10 @@ export function migrateSemesters(semesters: Semester[]): Semester[] {
   let changed = false;
   const migrated = semesters.map((s): Semester => {
     if (s.campus === '友谊') return s;
-    if (sectionTimesEqual(s.sectionTimes, YOUYI_SUMMER_TIMES)) {
-      changed = true;
-      return {
-        ...s,
-        campus: '友谊',
-        sectionTimes: YOUYI_SUMMER_TIMES,
-        altSectionTimes: YOUYI_WINTER_TIMES,
-      };
-    }
-    if (sectionTimesEqual(s.sectionTimes, YOUYI_WINTER_TIMES)) {
+    if (
+      sectionTimesEqual(s.sectionTimes, YOUYI_SUMMER_TIMES) ||
+      sectionTimesEqual(s.sectionTimes, YOUYI_WINTER_TIMES)
+    ) {
       changed = true;
       return {
         ...s,
@@ -253,13 +247,13 @@ import { migrateSemesters } from '@/utils/campusTimes';
 
 ```ts
       onRehydrateStorage: () => (state) => {
-        if (state) {
+        if (state && Array.isArray(state.semesters)) {
           const migrated = migrateSemesters(state.semesters);
           if (migrated !== state.semesters) {
             useSettingsStore.setState({ semesters: migrated });
           }
-          state.setHydrated(true);
         }
+        state?.setHydrated(true);
       },
 ```
 
@@ -383,10 +377,17 @@ import { getSectionTimesForDate } from './campusTimes';
       const sorted = [...slot.classSections].sort((a, b) => a - b);
       const firstSec = sorted[0];
       const lastSec = sorted[sorted.length - 1];
-      const times = getSectionTimesForDate(semester, date);
       const startTime = times[firstSec - 1]?.start ?? '';
       const endTime = times[lastSec - 1]?.end ?? '';
 ```
+
+并在 `const items: WidgetCourseItem[] = [];` 之后、`for (const course of courses) {` 之前加：
+
+```ts
+  const times = getSectionTimesForDate(semester, date);
+```
+
+（times 与 slot 无关，提升出循环，每日期只计算一次）
 
 说明：`buildDayCourses(date, ...)` 每次调用已带具体日期，今天/明天各自按各自日期判定（如 4/30 冬、5/1 夏）。
 
@@ -824,12 +825,48 @@ const BOUNDARY_LINE_WIDTH = 3;
   },
 ```
 
-- [ ] **步骤 8：运行类型检查**
+- [ ] **步骤 8：override 每周重置（与"按选中日期、每周重置"决策一致）**
+
+PanResponder 的 `onPanResponderRelease` 两个分支，在调用 `onWeekChangeRef.current(...)` 之前各加 `setOverride(null);`：
+
+```ts
+      onPanResponderRelease: (_, gs) => {
+        if (gs.dx > swipeThreshold) {
+          setOverride(null);
+          onWeekChangeRef.current(weekOffsetRef.current - 1);
+        } else if (gs.dx < -swipeThreshold) {
+          setOverride(null);
+          onWeekChangeRef.current(weekOffsetRef.current + 1);
+        }
+      },
+```
+
+7天/3天 两个切换按钮的 onPress 同样先 `setOverride(null);`：
+
+```tsx
+          <TouchableOpacity
+            onPress={() => {
+              setOverride(null);
+              setDayMode(7);
+            }}
+```
+
+```tsx
+          <TouchableOpacity
+            onPress={() => {
+              setOverride(null);
+              setDayMode(3);
+            }}
+```
+
+（PanResponder 在 useLayoutEffect([]) 中创建，`setOverride` 是 useState 的稳定 setter，引用安全，无需改 deps）
+
+- [ ] **步骤 9：运行类型检查**
 
 运行：`npm run typecheck`
 预期：无输出，退出码 0
 
-- [ ] **步骤 9：Commit**
+- [ ] **步骤 10：Commit**
 
 ```bash
 git add src/components/CourseSchedule.tsx
