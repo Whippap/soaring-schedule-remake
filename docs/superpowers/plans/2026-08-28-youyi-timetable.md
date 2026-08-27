@@ -656,8 +656,10 @@ const BOUNDARY_LINE_WIDTH = 3;
   const activeSeason = override?.key === currentKey ? override.season : autoSeason;
   // 边界周：时间列跟随 activeSeason（可切换）；其余情况按日期显示（假期/长安/不跨更替周）
   let activeTimes = getSectionTimesForDate(semester, anchor);
-  if (boundary !== null && activeSeason === 'winter') {
-    activeTimes = semester.altSectionTimes ?? semester.sectionTimes;
+  if (boundary !== null) {
+    const summer = semester.sectionTimes;
+    const winter = semester.altSectionTimes ?? semester.sectionTimes;
+    activeTimes = activeSeason === 'summer' ? summer : winter;
   }
 
   const toggleSeason = () => {
@@ -758,7 +760,24 @@ const BOUNDARY_LINE_WIDTH = 3;
                 {Array.from({ length: semester.sectionCount }, (_, i) => i + 1).map((sec) => (
 ```
 
-- [ ] **步骤 5：加粗竖线（gridBody 内，天列之后）**
+- [ ] **步骤 5：课程块 top 补偿切换行高度（否则边界周课程块与节次行错位 30px）**
+
+将课程块 style 中的：
+
+```tsx
+                          top: (block.firstSection - 1) * ROW_HEIGHT + 2,
+```
+
+替换为：
+
+```tsx
+                          top:
+                            (block.firstSection - 1) * ROW_HEIGHT +
+                            2 +
+                            (boundary !== null ? TOGGLE_ROW_HEIGHT : 0),
+```
+
+- [ ] **步骤 6：加粗竖线（gridBody 内，天列之后）**
 
 在天列 `.map()` 结束的 `)}` 之后、`</View>`（gridBody 闭合）之前插入：
 
@@ -780,7 +799,7 @@ const BOUNDARY_LINE_WIDTH = 3;
           ) : null}
 ```
 
-- [ ] **步骤 6：StyleSheet 追加静态样式**
+- [ ] **步骤 7：StyleSheet 追加静态样式**
 
 在 `StyleSheet.create({...})` 的 `timeSubText` 定义之后加：
 
@@ -805,12 +824,12 @@ const BOUNDARY_LINE_WIDTH = 3;
   },
 ```
 
-- [ ] **步骤 7：运行类型检查**
+- [ ] **步骤 8：运行类型检查**
 
 运行：`npm run typecheck`
 预期：无输出，退出码 0
 
-- [ ] **步骤 8：Commit**
+- [ ] **步骤 9：Commit**
 
 ```bash
 git add src/components/CourseSchedule.tsx
