@@ -3,9 +3,10 @@ import { Platform, StyleSheet, View, TouchableOpacity, ScrollView } from 'react-
 import { Text, HelperText } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format, parseISO, isValid } from 'date-fns';
-import type { Semester, SectionTime } from '@/types';
+import type { Semester, SectionTime, Campus } from '@/types';
 import { createDefaultSemester } from '@/types';
 import { computeSemesterEndDate } from '@/utils/scheduleDate';
+import { applyCampusPreset } from '@/utils/campusTimes';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { Icon } from '@/components/Icon';
@@ -20,56 +21,9 @@ interface Props {
   onSave: (semester: Semester) => void;
 }
 
-const CAMPUS_PRESETS: Record<string, SectionTime[]> = {
-  长安校区: [
-    { start: '08:30', end: '09:15' },
-    { start: '09:25', end: '10:10' },
-    { start: '10:30', end: '11:15' },
-    { start: '11:25', end: '12:10' },
-    { start: '12:20', end: '13:05' },
-    { start: '13:05', end: '13:50' },
-    { start: '14:00', end: '14:45' },
-    { start: '14:55', end: '15:40' },
-    { start: '16:00', end: '16:45' },
-    { start: '16:55', end: '17:40' },
-    { start: '19:00', end: '19:45' },
-    { start: '19:55', end: '20:40' },
-    { start: '20:40', end: '21:25' },
-  ],
-  友谊校区夏季: [
-    { start: '08:00', end: '08:50' },
-    { start: '09:00', end: '09:50' },
-    { start: '10:10', end: '11:00' },
-    { start: '11:10', end: '12:00' },
-    { start: '12:20', end: '13:05' },
-    { start: '13:05', end: '13:50' },
-    { start: '14:30', end: '15:20' },
-    { start: '15:30', end: '16:20' },
-    { start: '16:40', end: '17:30' },
-    { start: '17:40', end: '18:30' },
-    { start: '19:30', end: '20:20' },
-    { start: '20:30', end: '21:20' },
-  ],
-  友谊校区冬季: [
-    { start: '08:00', end: '08:50' },
-    { start: '09:00', end: '09:50' },
-    { start: '10:10', end: '11:00' },
-    { start: '11:10', end: '12:00' },
-    { start: '12:20', end: '13:05' },
-    { start: '13:05', end: '13:50' },
-    { start: '14:00', end: '14:50' },
-    { start: '15:00', end: '15:50' },
-    { start: '16:10', end: '17:00' },
-    { start: '17:10', end: '18:00' },
-    { start: '19:00', end: '19:50' },
-    { start: '20:00', end: '20:50' },
-  ],
-};
-
-const PRESET_LABELS = [
-  { value: '长安校区', label: '长安' },
-  { value: '友谊校区夏季', label: '友谊夏' },
-  { value: '友谊校区冬季', label: '友谊冬' },
+const PRESET_LABELS: { value: Campus; label: string }[] = [
+  { value: '长安', label: '长安' },
+  { value: '友谊', label: '友谊' },
 ];
 
 export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: Props) {
@@ -82,7 +36,10 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
   const [sectionTimes, setSectionTimes] = useState<SectionTime[]>(
     editing?.sectionTimes ?? createDefaultSemester().sectionTimes,
   );
-  const [selectedPreset, setSelectedPreset] = useState('长安校区');
+  const [altSectionTimes, setAltSectionTimes] = useState<SectionTime[] | undefined>(
+    editing?.altSectionTimes,
+  );
+  const [selectedPreset, setSelectedPreset] = useState<Campus>('长安');
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   // 当弹窗打开或编辑对象变化时，同步重置表单
@@ -103,6 +60,8 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
       setWeekCount(String(editing?.weekCount ?? 20));
       setSectionCount(String(editing?.sectionCount ?? 13));
       setSectionTimes(editing?.sectionTimes ?? createDefaultSemester().sectionTimes);
+      setAltSectionTimes(editing?.altSectionTimes);
+      setSelectedPreset(editing?.campus ?? '长安');
     }
   });
 
@@ -125,28 +84,38 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
     ? computeSemesterEndDate(startDate, parseInt(weekCount, 10) || 0)
     : '';
 
-  const handlePreset = (preset: string) => {
-    setSelectedPreset(preset);
-    setSectionTimes(CAMPUS_PRESETS[preset]);
-    setSectionCount(String(CAMPUS_PRESETS[preset].length));
+  const handlePreset = (campus: Campus) => {
+    setSelectedPreset(campus);
+    const preset = applyCampusPreset(campus);
+    setSectionTimes(preset.sectionTimes);
+    setAltSectionTimes(preset.altSectionTimes);
+    setSectionCount(String(preset.sectionTimes.length));
+  };
+
+  // 按目标节数裁剪/追加；两套时间（主/辅）需同步保持长度一致
+  const resizeTimes = (times: SectionTime[], n: number): SectionTime[] => {
+    if (n <= times.length) {
+      return times.slice(0, n);
+    }
+    const last = times[times.length - 1] ?? { start: '08:30', end: '09:15' };
+    const [lh, lm] = last.end.split(':').map(Number);
+    let cursor = (lh ?? 8) * 60 + (lm ?? 30) + 10;
+    const appended = [...times];
+    for (let i = appended.length; i < n; i++) {
+      const start = cursor;
+      const end = start + 45;
+      appended.push({ start: formatTime(start), end: formatTime(end) });
+      cursor = end + 10;
+    }
+    return appended;
   };
 
   const handleSectionCountChange = (value: string) => {
     setSectionCount(value);
     const n = parseInt(value, 10) || 0;
-    if (n > sectionTimes.length) {
-      const last = sectionTimes[sectionTimes.length - 1] ?? { start: '08:30', end: '09:15' };
-      const [lh, lm] = last.end.split(':').map(Number);
-      const cursor = (lh ?? 8) * 60 + (lm ?? 30) + 10;
-      const appended = [...sectionTimes];
-      for (let i = appended.length; i < n; i++) {
-        const start = cursor;
-        const end = start + 45;
-        appended.push({ start: formatTime(start), end: formatTime(end) });
-      }
-      setSectionTimes(appended);
-    } else if (n < sectionTimes.length) {
-      setSectionTimes(sectionTimes.slice(0, n));
+    setSectionTimes(resizeTimes(sectionTimes, n));
+    if (altSectionTimes) {
+      setAltSectionTimes(resizeTimes(altSectionTimes, n));
     }
   };
 
@@ -163,7 +132,7 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
     const sections = parseInt(sectionCount, 10);
     if (!trimmed) return;
     if (!startDate || Number.isNaN(weeks) || weeks <= 0 || Number.isNaN(sections) || sections <= 0) return;
-    if (hasOverlap(sectionTimes)) {
+    if (hasOverlap(sectionTimes) || (altSectionTimes && hasOverlap(altSectionTimes))) {
       showSnackbar('课节时间存在重叠或倒置');
       return;
     }
@@ -174,6 +143,8 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
       weekCount: weeks,
       sectionCount: sections,
       sectionTimes,
+      campus: selectedPreset,
+      altSectionTimes,
     };
     const overlap = existing.some(
       (s) =>
@@ -312,6 +283,11 @@ export function SemesterForm({ visible, existing, editing, onDismiss, onSave }: 
               </TouchableOpacity>
             ))}
           </View>
+          {selectedPreset === '友谊' ? (
+            <HelperText type="info" style={{ color: dt.colors.textSecondary }}>
+              含夏、冬两套时间，5月1日、10月1日自动切换
+            </HelperText>
+          ) : null}
 
           <View style={[styles.actions, { marginTop: dt.spacing.xl }]}>
             <TouchableOpacity
