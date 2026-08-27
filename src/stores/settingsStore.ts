@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Semester } from '@/types';
+import { migrateSemesters } from '@/utils/campusTimes';
 import { DEFAULT_THEME_COLOR } from '@/types';
 import { useCourseStore } from './courseStore';
 
@@ -77,7 +78,13 @@ export const useSettingsStore = create<SettingsState>()(
         darkMode: state.darkMode,
       }),
       onRehydrateStorage: () => (state) => {
-        state?.setHydrated(true);
+        if (state) {
+          const migrated = migrateSemesters(state.semesters);
+          if (migrated !== state.semesters) {
+            useSettingsStore.setState({ semesters: migrated });
+          }
+          state.setHydrated(true);
+        }
       },
     },
   ),
