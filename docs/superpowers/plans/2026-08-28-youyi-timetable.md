@@ -186,7 +186,7 @@ export function findSeasonBoundary(days: Date[]): number | null {
  */
 export function migrateSemesters(semesters: Semester[]): Semester[] {
   let changed = false;
-  const migrated = semesters.map((s) => {
+  const migrated = semesters.map((s): Semester => {
     if (s.campus === '友谊') return s;
     if (sectionTimesEqual(s.sectionTimes, YOUYI_SUMMER_TIMES)) {
       changed = true;
