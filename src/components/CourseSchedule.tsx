@@ -24,11 +24,19 @@ import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { getOnColor } from '@/utils/color';
 import { CourseDetailSheet } from '@/components/CourseDetailSheet';
 import { formatLocationForDisplay } from '@/utils/locationFormat';
+import {
+  findSeasonBoundary,
+  getSectionTimesForDate,
+  getYouyiSeasonForDate,
+  type YouyiSeason,
+} from '@/utils/campusTimes';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ROW_HEIGHT = 52;
 const TIME_COLUMN_WIDTH = 42;
 const DAY_NAMES = ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+const TOGGLE_ROW_HEIGHT = 30;
+const BOUNDARY_LINE_WIDTH = 3;
 
 interface Props {
   semesters: Semester[];
@@ -58,6 +66,10 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
   const [refreshing, setRefreshing] = useState(false);
   const [detailCourse, setDetailCourse] = useState<Course | null>(null);
 
+  // 友谊双时间表切换：override 以 `${weekOffset}-${dayMode}` 为 key，
+  // 滑到其他周或切换 7天/3天 时 key 变化自动失效（回到按选中日期判定）
+  const [override, setOverride] = useState<{ key: string; season: YouyiSeason } | null>(null);
+
   const anchor = addDays(new Date(), weekOffset * 7);
   const semester = findSemesterForDate(anchor, semesters);
   const isDefault = semesters.length === 0 || semester.id === 'default';
@@ -74,6 +86,22 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
   );
 
   const columnWidth = (SCREEN_WIDTH - TIME_COLUMN_WIDTH) / days.length;
+
+  const isYouyi = semester.campus === '友谊' && !isDefault;
+  const boundary = isYouyi ? findSeasonBoundary(days) : null;
+  const currentKey = `${weekOffset}-${dayMode}`;
+  const autoSeason = getYouyiSeasonForDate(anchor);
+  const activeSeason = override?.key === currentKey ? override.season : autoSeason;
+  // 边界周：时间列跟随 activeSeason（可切换）；其余情况按日期显示（假期/长安/不跨更替周）
+  let activeTimes = getSectionTimesForDate(semester, anchor);
+  if (boundary !== null && activeSeason === 'winter') {
+    activeTimes = semester.altSectionTimes ?? semester.sectionTimes;
+  }
+
+  const toggleSeason = () => {
+    const next: YouyiSeason = activeSeason === 'summer' ? 'winter' : 'summer';
+    setOverride({ key: currentKey, season: next });
+  };
 
   const swipeThreshold = 25;
   const weekOffsetRef = useRef(weekOffset);
@@ -265,11 +293,22 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
         <View style={styles.gridBody} {...panHandlers}>
           {/* Time Column */}
           <View style={{ width: TIME_COLUMN_WIDTH }}>
+            {boundary !== null ? (
+              <TouchableOpacity
+                onPress={toggleSeason}
+                activeOpacity={0.7}
+                style={[styles.seasonToggle, { borderRightColor: dt.colors.border }]}
+              >
+                <Text style={[styles.seasonToggleText, { color: dt.colors.primary }]}>
+                  {activeSeason === 'winter' ? '◀冬' : '夏▶'}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
             {Array.from({ length: semester.sectionCount }, (_, i) => i + 1).map((sec) => (
               <View key={sec} style={[styles.timeCell, { height: ROW_HEIGHT, borderRightColor: dt.colors.border }]}>
                 <Text style={[styles.timeText, { color: dt.colors.textMuted }]}>{sec}</Text>
                 <Text style={[styles.timeSubText, { color: dt.colors.textMuted }]}>
-                  {semester.sectionTimes[sec - 1]?.start ?? ''}
+                  {activeTimes[sec - 1]?.start ?? ''}
                 </Text>
               </View>
             ))}
@@ -286,12 +325,21 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
                   styles.dayColumn,
                   {
                     width: columnWidth,
-                    height: semester.sectionCount * ROW_HEIGHT,
+                    height:
+                      semester.sectionCount * ROW_HEIGHT + (boundary !== null ? TOGGLE_ROW_HEIGHT : 0),
                     borderRightColor: dt.colors.border,
                   },
                   isToday(date) && { backgroundColor: `${dt.colors.primary}0D` },
                 ]}
               >
+                {boundary !== null ? (
+                  <View
+                    style={[
+                      styles.seasonToggleSpacer,
+                      { borderBottomColor: dt.colors.border },
+                    ]}
+                  />
+                ) : null}
                 {Array.from({ length: semester.sectionCount }, (_, i) => i + 1).map((sec) => (
                   <View
                     key={sec}
@@ -356,6 +404,21 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
               </View>
             );
           })}
+          {boundary !== null ? (
+            <View
+              pointerEvents="none"
+              style={[
+                styles.seasonBoundaryLine,
+                {
+                  left: Math.max(
+                    TIME_COLUMN_WIDTH,
+                    TIME_COLUMN_WIDTH + boundary * columnWidth - BOUNDARY_LINE_WIDTH / 2,
+                  ),
+                  backgroundColor: dt.colors.primary,
+                },
+              ]}
+            />
+          ) : null}
         </View>
         <View style={{ height: 80 }} />
       </ScrollView>
@@ -425,6 +488,24 @@ const styles = StyleSheet.create({
   },
   timeText: { fontSize: 11, fontWeight: 'bold' },
   timeSubText: { fontSize: 9, marginTop: 1 },
+  seasonToggle: {
+    height: TOGGLE_ROW_HEIGHT,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRightWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  seasonToggleText: { fontSize: 10, fontWeight: 'bold' },
+  seasonToggleSpacer: {
+    height: TOGGLE_ROW_HEIGHT,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  seasonBoundaryLine: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: BOUNDARY_LINE_WIDTH,
+  },
   dayColumn: {
     borderRightWidth: StyleSheet.hairlineWidth,
   },
