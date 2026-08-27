@@ -94,8 +94,10 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
   const activeSeason = override?.key === currentKey ? override.season : autoSeason;
   // 边界周：时间列跟随 activeSeason（可切换）；其余情况按日期显示（假期/长安/不跨更替周）
   let activeTimes = getSectionTimesForDate(semester, anchor);
-  if (boundary !== null && activeSeason === 'winter') {
-    activeTimes = semester.altSectionTimes ?? semester.sectionTimes;
+  if (boundary !== null) {
+    const summer = semester.sectionTimes;
+    const winter = semester.altSectionTimes ?? semester.sectionTimes;
+    activeTimes = activeSeason === 'summer' ? summer : winter;
   }
 
   const toggleSeason = () => {
@@ -360,7 +362,10 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
                       style={[
                         styles.courseBlock,
                         {
-                          top: (block.firstSection - 1) * ROW_HEIGHT + 2,
+                          top:
+                            (block.firstSection - 1) * ROW_HEIGHT +
+                            2 +
+                            (boundary !== null ? TOGGLE_ROW_HEIGHT : 0),
                           height: block.sections.length * ROW_HEIGHT - 4,
                           backgroundColor: isDefault || !inSemesterRange
                             ? dt.colors.surfaceAlt
