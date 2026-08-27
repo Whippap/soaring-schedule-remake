@@ -36,6 +36,8 @@ export interface SectionTime {
   end: string;
 }
 
+export type Campus = '长安' | '友谊';
+
 export interface Semester {
   id: string;
   name: string;
@@ -43,7 +45,9 @@ export interface Semester {
   endDate: string;
   weekCount: number;
   sectionCount: number;
-  sectionTimes: SectionTime[];
+  sectionTimes: SectionTime[]; // 友谊：夏季 12 节；长安/假期：默认一套
+  campus?: Campus; // 缺省视为长安，兼容旧数据与导入数据
+  altSectionTimes?: SectionTime[]; // 仅友谊：冬季 12 节
 }
 
 export { courseColors as PRESET_COLORS, importColors as IMPORT_COLORS } from '@/design';
