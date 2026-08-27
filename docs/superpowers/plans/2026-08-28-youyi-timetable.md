@@ -655,12 +655,10 @@ const BOUNDARY_LINE_WIDTH = 3;
   const autoSeason = getYouyiSeasonForDate(anchor);
   const activeSeason = override?.key === currentKey ? override.season : autoSeason;
   // 边界周：时间列跟随 activeSeason（可切换）；其余情况按日期显示（假期/长安/不跨更替周）
-  const activeTimes =
-    boundary !== null
-      ? activeSeason === 'summer'
-        ? semester.sectionTimes
-        : (semester.altSectionTimes ?? semester.sectionTimes)
-      : getSectionTimesForDate(semester, anchor);
+  let activeTimes = getSectionTimesForDate(semester, anchor);
+  if (boundary !== null && activeSeason === 'winter') {
+    activeTimes = semester.altSectionTimes ?? semester.sectionTimes;
+  }
 
   const toggleSeason = () => {
     const next: YouyiSeason = activeSeason === 'summer' ? 'winter' : 'summer';

@@ -52,3 +52,5 @@ REQUIREMENTS.md
 document/
 .claude/
 .vscode/
+# SDD temp ledger
+.superpowers/
