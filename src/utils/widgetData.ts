@@ -58,6 +58,7 @@ function buildDayCourses(
   if (!inRange) return [];
 
   const items: WidgetCourseItem[] = [];
+  const times = getSectionTimesForDate(semester, date);
   for (const course of courses) {
     if (course.semesterId !== semester.id) continue;
     for (const slot of course.timeSlots) {
@@ -68,7 +69,6 @@ function buildDayCourses(
       const sorted = [...slot.classSections].sort((a, b) => a - b);
       const firstSec = sorted[0];
       const lastSec = sorted[sorted.length - 1];
-      const times = getSectionTimesForDate(semester, date);
       const startTime = times[firstSec - 1]?.start ?? '';
       const endTime = times[lastSec - 1]?.end ?? '';
 

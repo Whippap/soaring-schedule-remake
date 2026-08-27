@@ -121,8 +121,10 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
         Math.abs(gs.dx) > 10 && Math.abs(gs.dx) > Math.abs(gs.dy) * 0.6,
       onPanResponderRelease: (_, gs) => {
         if (gs.dx > swipeThreshold) {
+          setOverride(null);
           onWeekChangeRef.current(weekOffsetRef.current - 1);
         } else if (gs.dx < -swipeThreshold) {
+          setOverride(null);
           onWeekChangeRef.current(weekOffsetRef.current + 1);
         }
       },
@@ -212,7 +214,10 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
         </View>
         <View style={[styles.dayToggle, { backgroundColor: dt.colors.surfaceAlt }]}>
           <TouchableOpacity
-            onPress={() => setDayMode(7)}
+            onPress={() => {
+              setOverride(null);
+              setDayMode(7);
+            }}
             style={[
               styles.toggleBtn,
               dayMode === 7 && { backgroundColor: dt.colors.primary },
@@ -229,7 +234,10 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setDayMode(3)}
+            onPress={() => {
+              setOverride(null);
+              setDayMode(3);
+            }}
             style={[
               styles.toggleBtn,
               dayMode === 3 && { backgroundColor: dt.colors.primary },

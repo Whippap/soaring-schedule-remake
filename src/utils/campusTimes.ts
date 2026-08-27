@@ -111,16 +111,10 @@ export function migrateSemesters(semesters: Semester[]): Semester[] {
   let changed = false;
   const migrated = semesters.map((s): Semester => {
     if (s.campus === '友谊') return s;
-    if (sectionTimesEqual(s.sectionTimes, YOUYI_SUMMER_TIMES)) {
-      changed = true;
-      return {
-        ...s,
-        campus: '友谊',
-        sectionTimes: YOUYI_SUMMER_TIMES,
-        altSectionTimes: YOUYI_WINTER_TIMES,
-      };
-    }
-    if (sectionTimesEqual(s.sectionTimes, YOUYI_WINTER_TIMES)) {
+    if (
+      sectionTimesEqual(s.sectionTimes, YOUYI_SUMMER_TIMES) ||
+      sectionTimesEqual(s.sectionTimes, YOUYI_WINTER_TIMES)
+    ) {
       changed = true;
       return {
         ...s,
