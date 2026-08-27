@@ -229,7 +229,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 - [ ] **步骤 1：加入 import 并在 `onRehydrateStorage` 中执行迁移**
 
-修改 `src/stores/settingsStore.ts` 顶部 import 区，在 `import type { Semester } from '@/types';` 之后加一行：
+修改 `src/stores/settingsStore.ts` 顶部 import 区，将两条 `@/types` 导入合并为一条（`import { DEFAULT_THEME_COLOR, type Semester } from '@/types';`），并在其后加一行：
 
 ```ts
 import { migrateSemesters } from '@/utils/campusTimes';
