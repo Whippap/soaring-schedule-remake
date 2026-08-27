@@ -64,6 +64,8 @@ export interface Semester {
 集中管理预设与时间判定（消除 `SemesterForm` / `TimeTableEditor` 中预设重复的代码异味）：
 
 ```ts
+export type YouyiSeason = 'summer' | 'winter';
+
 export const CHANGAN_SECTION_TIMES: SectionTime[];   // 13 节，原 SemesterForm 中的值
 export const YOUYI_SUMMER_TIMES: SectionTime[];      // 12 节，原「友谊校区夏季」
 export const YOUYI_WINTER_TIMES: SectionTime[];      // 12 节，原「友谊校区冬季」
@@ -125,7 +127,7 @@ const activeTimes = boundary !== null
 
 ```ts
 // key = `${weekOffset}-${dayMode}`；override 只在 key 匹配时生效
-const [override, setOverride] = useState<{ key: string; season: Season } | null>(null);
+const [override, setOverride] = useState<{ key: string; season: YouyiSeason } | null>(null);
 const autoSeason = getYouyiSeasonForDate(anchor);
 const activeSeason = override?.key === currentKey ? override.season : autoSeason;
 ```
