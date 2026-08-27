@@ -8,6 +8,7 @@ import {
   formatSections,
 } from './scheduleDate';
 import { formatLocationForDisplay } from './locationFormat';
+import { getSectionTimesForDate } from './campusTimes';
 
 const WIDGET_DATA_KEY = '@soaring_schedule:widget_data';
 const DARK_MODE_KEY = '@soaring_schedule:dark_mode';
@@ -67,8 +68,9 @@ function buildDayCourses(
       const sorted = [...slot.classSections].sort((a, b) => a - b);
       const firstSec = sorted[0];
       const lastSec = sorted[sorted.length - 1];
-      const startTime = semester.sectionTimes[firstSec - 1]?.start ?? '';
-      const endTime = semester.sectionTimes[lastSec - 1]?.end ?? '';
+      const times = getSectionTimesForDate(semester, date);
+      const startTime = times[firstSec - 1]?.start ?? '';
+      const endTime = times[lastSec - 1]?.end ?? '';
 
       items.push({
         id: `${course.id}-${slot.dayOfWeek}`,
