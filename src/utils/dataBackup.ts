@@ -5,6 +5,7 @@ import type { Course, Semester } from '@/types';
 import { DEFAULT_THEME_COLOR } from '@/types';
 import { useCourseStore } from '@/stores/courseStore';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { migrateSemesters } from './campusTimes';
 
 const COURSES_KEY = 'soaring-schedule-courses';
 const SETTINGS_KEY = 'soaring-schedule-settings';
@@ -100,19 +101,21 @@ export async function importData(): Promise<{ success: boolean; message: string 
       return { success: false, message: '文件结构不符合预期' };
     }
 
+    const migratedSemesters = migrateSemesters(parsed.settings.semesters);
+
     await AsyncStorage.setItem(
       COURSES_KEY,
       JSON.stringify({ state: { courses: parsed.courses }, version: 0 }),
     );
     await AsyncStorage.setItem(
       SETTINGS_KEY,
-      JSON.stringify({ state: parsed.settings, version: 0 }),
+      JSON.stringify({ state: { ...parsed.settings, semesters: migratedSemesters }, version: 0 }),
     );
 
     // 直接更新 Zustand store 内存状态，避免必须重启应用
     useCourseStore.setState({ courses: parsed.courses });
     useSettingsStore.setState({
-      semesters: parsed.settings.semesters,
+      semesters: migratedSemesters,
       themeColor: parsed.settings.themeColor,
       darkMode: parsed.settings.darkMode,
     });
