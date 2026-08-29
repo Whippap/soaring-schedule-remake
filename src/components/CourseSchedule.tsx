@@ -42,7 +42,9 @@ const BOUNDARY_LINE_WIDTH = 3;
 interface Props {
   semesters: Semester[];
   weekOffset: number;
+  dayMode: 7 | 3;
   onWeekChange: (offset: number) => void;
+  onDayModeChange: (mode: 7 | 3) => void;
   onEdit?: (course: Course) => void;
 }
 
@@ -59,11 +61,17 @@ interface RenderedBlock {
   firstSection: number;
 }
 
-export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffset, onWeekChange, onEdit }: Props) {
+export const CourseSchedule = memo(function CourseSchedule({
+  semesters,
+  weekOffset,
+  dayMode,
+  onWeekChange,
+  onDayModeChange,
+  onEdit,
+}: Props) {
   const dt = useDesignTokens();
   const courses = useCourseStore((s) => s.courses);
   const deleteCourse = useCourseStore((s) => s.deleteCourse);
-  const [dayMode, setDayMode] = useState<7 | 3>(7);
   const [refreshing, setRefreshing] = useState(false);
   const [detailCourse, setDetailCourse] = useState<Course | null>(null);
 
@@ -226,7 +234,7 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
           <TouchableOpacity
             onPress={() => {
               setOverride(null);
-              setDayMode(7);
+              onDayModeChange(7);
             }}
             style={[
               styles.toggleBtn,
@@ -246,7 +254,7 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
           <TouchableOpacity
             onPress={() => {
               setOverride(null);
-              setDayMode(3);
+              onDayModeChange(3);
             }}
             style={[
               styles.toggleBtn,

@@ -20,6 +20,7 @@ export default function HomeScreen() {
   const [courseFormVisible, setCourseFormVisible] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [weekOffset, setWeekOffset] = useState(0);
+  const [dayMode, setDayMode] = useState<7 | 3>(7);
 
   const effectiveSemesters = semesters.length > 0 ? semesters : [createDefaultSemester()];
   const currentSemester = findSemesterForDate(new Date(), semesters);
@@ -49,7 +50,9 @@ export default function HomeScreen() {
         <CourseSchedule
           semesters={effectiveSemesters}
           weekOffset={weekOffset}
+          dayMode={dayMode}
           onWeekChange={setWeekOffset}
+          onDayModeChange={setDayMode}
           onEdit={handleEdit}
         />
       ) : (
