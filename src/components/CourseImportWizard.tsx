@@ -5,7 +5,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { useCourseStore } from '@/stores/courseStore';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
 import { useSnackbar } from '@/hooks/useSnackbar';
-import { enhanceExtractedData, convertToCourses, parseScheduleText, computeMaxWeekAndSection, buildDefaultSectionTimes } from '@/utils/jwxtParser';
+import { enhanceExtractedData, convertToCourses, parseScheduleText, computeMaxWeekAndSection, buildDefaultSectionTimes, isUnscheduledCourse } from '@/utils/jwxtParser';
 import { formatTimeSlot, toISODate, computeSemesterEndDate } from '@/utils/scheduleDate';
 import { JwxtWebView } from './JwxtWebView';
 import { SemesterForm } from './SemesterForm';
@@ -130,6 +130,8 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
   const filteredPreview = parsedData
     ? parsedData.courses.filter((c) => !selectedDataSemester || c.dataSemester === selectedDataSemester)
     : [];
+  const importableCourses = filteredPreview.filter((c) => !isUnscheduledCourse(c));
+  const skippedCourses = filteredPreview.filter((c) => isUnscheduledCourse(c));
 
   return (
     <Portal>
@@ -228,9 +230,9 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
               ) : null}
 
               <Text style={{ fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading, color: dt.colors.text, marginTop: 12, marginBottom: 8 }}>
-                预览（{filteredPreview.length} 门）
+                预览（{importableCourses.length} 门）
               </Text>
-              {filteredPreview.slice(0, 5).map((c, i) => (
+              {importableCourses.slice(0, 5).map((c, i) => (
                 <View key={i} style={[styles.previewItem, { borderBottomColor: dt.colors.surfaceAlt }]}>
                   <Text style={[styles.previewName, { color: dt.colors.text }]}>{c.name}</Text>
                   {c.scheduleText ? (
@@ -239,8 +241,37 @@ export function CourseImportWizard({ visible, onDismiss }: Props) {
                   ) : null}
                 </View>
               ))}
-              {filteredPreview.length > 5 ? (
-                <Text style={[styles.moreText, { color: dt.colors.textSecondary }]}>...还有 {filteredPreview.length - 5} 门课程</Text>
+              {importableCourses.length > 5 ? (
+                <Text style={[styles.moreText, { color: dt.colors.textSecondary }]}>...还有 {importableCourses.length - 5} 门课程</Text>
+              ) : null}
+
+              {skippedCourses.length > 0 ? (
+                <View style={{ marginTop: 12 }}>
+                  <Text
+                    style={{
+                      fontSize: dt.fontSize.body,
+                      fontWeight: dt.fontWeight.subheading,
+                      color: dt.colors.text,
+                      marginBottom: 8,
+                    }}
+                  >
+                    以下课程不排课，不会导入课表（{skippedCourses.length} 门）
+                  </Text>
+                  {skippedCourses.map((c, i) => (
+                    <View
+                      key={i}
+                      style={[styles.previewItem, { borderBottomColor: dt.colors.surfaceAlt }]}
+                    >
+                      <Text
+                        style={[styles.previewName, { color: dt.colors.textSecondary }]}
+                        numberOfLines={1}
+                      >
+                        {c.name}
+                        {c.code ? `（${c.code}）` : ''}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
               ) : null}
 
               <View style={styles.actions}>
