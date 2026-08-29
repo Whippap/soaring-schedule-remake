@@ -2,7 +2,7 @@
   "expo": {
     "name": "翱翔课表",
     "slug": "soaring-schedule",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon/android/play_store_512.png",
     "scheme": "soaringschedule",
