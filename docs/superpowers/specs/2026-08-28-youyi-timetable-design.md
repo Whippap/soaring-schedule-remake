@@ -138,7 +138,7 @@ const activeSeason = override?.key === currentKey ? override.season : autoSeason
 
 - **切换按钮**：时间列顶部、第一节时间上方，新增一行高 `TOGGLE_ROW_HEIGHT = 30`：
   - 宽度 42px（`TIME_COLUMN_WIDTH`），居中显示紧凑文本
-  - 文本：显示冬季时 `◀冬`（冬在左），显示夏季时 `夏▶`（夏在右），激活侧带箭头，颜色 `dt.colors.primary`，字号约 10、加粗
+  - 文本：显示两侧季节标签 + 激活侧箭头，左右排列跟随竖线实际布局——5月1日周（冬在左）显示 `◀冬 夏` / `冬 夏▶`；10月1日周（夏在左）显示 `◀夏 冬` / `夏 冬▶`。颜色 `dt.colors.primary`，字号约 10、加粗
   - 点击在夏/冬间切换；仅改变时间列文字
 - **对齐垫行**：每个天列顶部渲染同高（30px）的空白 View，保证网格行与时间列对齐；天列总高相应变为 `sectionCount * ROW_HEIGHT + TOGGLE_ROW_HEIGHT`
 - **加粗竖线**：在 `gridBody` 内绝对定位，`left = TIME_COLUMN_WIDTH + boundary * columnWidth`，宽 3px，`top: 0, bottom: 0`，颜色 `dt.colors.primary`，贯穿课程网格区域。`boundary === 0` 时画在首列左缘（可 clamp 到 `TIME_COLUMN_WIDTH`）

@@ -26,6 +26,7 @@ import { CourseDetailSheet } from '@/components/CourseDetailSheet';
 import { formatLocationForDisplay } from '@/utils/locationFormat';
 import {
   findSeasonBoundary,
+  getBoundarySeasons,
   getSectionTimesForDate,
   getYouyiSeasonForDate,
   type YouyiSeason,
@@ -89,9 +90,18 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
 
   const isYouyi = semester.campus === '友谊' && !isDefault;
   const boundary = isYouyi ? findSeasonBoundary(days) : null;
+  const boundarySeasons = boundary !== null ? getBoundarySeasons(days, boundary) : null;
   const currentKey = `${weekOffset}-${dayMode}`;
   const autoSeason = getYouyiSeasonForDate(anchor);
   const activeSeason = override?.key === currentKey ? override.season : autoSeason;
+  // 切换按钮两侧标签按竖线实际左右布局排列：5月1日周「◀冬 夏」，10月1日周「◀夏 冬」
+  const seasonToggleLabel = boundarySeasons
+    ? `${activeSeason === boundarySeasons.left ? '◀' : ''}${
+        boundarySeasons.left === 'winter' ? '冬' : '夏'
+      } ${boundarySeasons.right === 'winter' ? '冬' : '夏'}${
+        activeSeason === boundarySeasons.right ? '▶' : ''
+      }`
+    : '';
   // 边界周：时间列跟随 activeSeason（可切换）；其余情况按日期显示（假期/长安/不跨更替周）
   let activeTimes = getSectionTimesForDate(semester, anchor);
   if (boundary !== null) {
@@ -310,7 +320,7 @@ export const CourseSchedule = memo(function CourseSchedule({ semesters, weekOffs
                 style={[styles.seasonToggle, { borderRightColor: dt.colors.border }]}
               >
                 <Text style={[styles.seasonToggleText, { color: dt.colors.primary }]}>
-                  {activeSeason === 'winter' ? '◀冬' : '夏▶'}
+                  {seasonToggleLabel}
                 </Text>
               </TouchableOpacity>
             ) : null}

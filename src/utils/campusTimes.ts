@@ -104,6 +104,24 @@ export function findSeasonBoundary(days: Date[]): number | null {
 }
 
 /**
+ * 返回边界周竖线两侧的季节：
+ * left = days[boundary-1] 的季节（boundary === 0 时为 days[0] 前一天）；
+ * right = days[boundary] 的季节。
+ * 5月1日周为「冬|夏」，10月1日周为「夏|冬」——切换按钮按此排列两侧标签。
+ */
+export function getBoundarySeasons(
+  days: Date[],
+  boundary: number,
+): { left: YouyiSeason; right: YouyiSeason } {
+  const leftDate =
+    boundary === 0 ? new Date(days[0].getTime() - 24 * 60 * 60 * 1000) : days[boundary - 1];
+  return {
+    left: getYouyiSeasonForDate(leftDate),
+    right: getYouyiSeasonForDate(days[boundary]),
+  };
+}
+
+/**
  * 旧数据迁移（幂等）：识别旧「友谊校区夏季/冬季」预设并补全两套时间。
  * 无变化时返回原引用，调用方可用 `migrated !== semesters` 判断是否需要写回。
  */

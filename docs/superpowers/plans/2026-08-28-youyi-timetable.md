@@ -181,6 +181,24 @@ export function findSeasonBoundary(days: Date[]): number | null {
 }
 
 /**
+ * 返回边界周竖线两侧的季节：
+ * left = days[boundary-1] 的季节（boundary === 0 时为 days[0] 前一天）；
+ * right = days[boundary] 的季节。
+ * 5月1日周为「冬|夏」，10月1日周为「夏|冬」——切换按钮按此排列两侧标签。
+ */
+export function getBoundarySeasons(
+  days: Date[],
+  boundary: number,
+): { left: YouyiSeason; right: YouyiSeason } {
+  const leftDate =
+    boundary === 0 ? new Date(days[0].getTime() - 24 * 60 * 60 * 1000) : days[boundary - 1];
+  return {
+    left: getYouyiSeasonForDate(leftDate),
+    right: getYouyiSeasonForDate(days[boundary]),
+  };
+}
+
+/**
  * 旧数据迁移（幂等）：识别旧「友谊校区夏季/冬季」预设并补全两套时间。
  * 无变化时返回原引用，调用方可用 `migrated !== semesters` 判断是否需要写回。
  */
@@ -624,6 +642,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 ```ts
 import {
   findSeasonBoundary,
+  getBoundarySeasons,
   getSectionTimesForDate,
   getYouyiSeasonForDate,
   type YouyiSeason,
@@ -652,9 +671,18 @@ const BOUNDARY_LINE_WIDTH = 3;
 ```ts
   const isYouyi = semester.campus === '友谊' && !isDefault;
   const boundary = isYouyi ? findSeasonBoundary(days) : null;
+  const boundarySeasons = boundary !== null ? getBoundarySeasons(days, boundary) : null;
   const currentKey = `${weekOffset}-${dayMode}`;
   const autoSeason = getYouyiSeasonForDate(anchor);
   const activeSeason = override?.key === currentKey ? override.season : autoSeason;
+  // 切换按钮两侧标签按竖线实际左右布局排列：5月1日周「◀冬 夏」，10月1日周「◀夏 冬」
+  const seasonToggleLabel = boundarySeasons
+    ? `${activeSeason === boundarySeasons.left ? '◀' : ''}${
+        boundarySeasons.left === 'winter' ? '冬' : '夏'
+      } ${boundarySeasons.right === 'winter' ? '冬' : '夏'}${
+        activeSeason === boundarySeasons.right ? '▶' : ''
+      }`
+    : '';
   // 边界周：时间列跟随 activeSeason（可切换）；其余情况按日期显示（假期/长安/不跨更替周）
   let activeTimes = getSectionTimesForDate(semester, anchor);
   if (boundary !== null) {
@@ -699,7 +727,7 @@ const BOUNDARY_LINE_WIDTH = 3;
                 style={[styles.seasonToggle, { borderRightColor: dt.colors.border }]}
               >
                 <Text style={[styles.seasonToggleText, { color: dt.colors.primary }]}>
-                  {activeSeason === 'winter' ? '◀冬' : '夏▶'}
+                  {seasonToggleLabel}
                 </Text>
               </TouchableOpacity>
             ) : null}
@@ -713,6 +741,8 @@ const BOUNDARY_LINE_WIDTH = 3;
             ))}
           </View>
 ```
+
+说明：切换按钮两侧标签按竖线实际左右布局排列（5月1日周「◀冬 夏」，10月1日周「◀夏 冬」），由 `seasonToggleLabel`（派生值块）与 `getBoundarySeasons`（campusTimes）提供。
 
 - [ ] **步骤 4：天列 — 顶部对齐垫行 + 高度调整**
 
