@@ -8,6 +8,7 @@
     "android": "npx expo run:android",
     "web": "npx expo start --web",
     "lint": "npx expo lint",
+    "verify:jwxt": "npx tsx scripts/verify-jwxt-parser.ts",
     "typecheck": "npx tsc --noEmit",
     "ios": "npx expo run:ios",
     "wsl2": "npx expo start --tunnel"

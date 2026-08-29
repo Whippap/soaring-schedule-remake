@@ -60,7 +60,13 @@ const REAL_ROW_HTML = [
 ].join('');
 
 async function main() {
-  const { parseScheduleText, parseJwxtHtml } = await import('@/utils/jwxtParser');
+  const {
+    parseScheduleText,
+    parseJwxtHtml,
+    isUnscheduledCourse,
+    convertToCourses,
+    enhanceExtractedData,
+  } = await import('@/utils/jwxtParser');
 
   console.log('== parseScheduleText ==');
   check('空文本返回空数组', parseScheduleText(''), []);
@@ -72,7 +78,6 @@ async function main() {
   );
 
   console.log('== isUnscheduledCourse / convertToCourses / enhanceExtractedData ==');
-  const { isUnscheduledCourse, convertToCourses, enhanceExtractedData } = await import('@/utils/jwxtParser');
   check('空 scheduleText 判定为不排课', isUnscheduledCourse({ name: 'x', scheduleText: '' }), true);
   check('不排课拼接文本判定为不排课', isUnscheduledCourse({ name: 'x', scheduleText: '不排课 备注：' }), true);
   check(
@@ -104,7 +109,7 @@ async function main() {
 
   const real = parseJwxtHtml(REAL_ROW_HTML);
   check('真实行课程数', real.courses.length, 1);
-  check('真实行 scheduleText 含时间', real.courses[0]?.scheduleText.includes('1-14周'), true);
+  check('真实行 scheduleText 含时间', real.courses[0]?.scheduleText?.includes('1-14周') ?? false, true);
   check('真实行 location 含校区', real.courses[0]?.location?.includes('友谊校区'), true);
 
   const empty = parseJwxtHtml('<div><h3>机械设计Ⅰ</h3></div>');
