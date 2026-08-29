@@ -440,8 +440,12 @@ export function parseJwxtHtml(html: string): ParsedData {
     let tdMatch;
     let scheduleText = '';
     let location = '';
+    let noSchedule = false;
     while ((tdMatch = tdRe.exec(trContent)) !== null) {
       const tdText = tdMatch[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+      if (tdText === '不排课') {
+        noSchedule = true;
+      }
       if (tdText.includes('第') && (tdText.includes('节') || tdText.includes('周'))) {
         scheduleText = tdText;
       }
@@ -452,7 +456,7 @@ export function parseJwxtHtml(html: string): ParsedData {
       }
     }
 
-    if (!scheduleText) {
+    if (!scheduleText && !noSchedule) {
       const allTds = [...trContent.matchAll(tdRe)].map((m) => m[1].replace(/<[^>]+>/g, '').trim());
       scheduleText = allTds.slice(-2).join(' ') || trContent.replace(/<[^>]+>/g, '');
     }
@@ -468,25 +472,6 @@ export function parseJwxtHtml(html: string): ParsedData {
       scheduleText,
       location: location || undefined,
     });
-  }
-
-  if (courses.length === 0) {
-    const h3Re = /<h3[^>]*>([^<]+)<\/h3>/g;
-    const showSchedRe = /class=["'][^"']*showSchedules[^"']*["'][^>]*>([^<]+)/g;
-    const foundNames = new Set<string>();
-    let m;
-    while ((m = h3Re.exec(html)) !== null) {
-      if (m[1].trim().length >= 2) foundNames.add(m[1].trim());
-    }
-    while ((m = showSchedRe.exec(html)) !== null) {
-      if (m[1].trim().length >= 2) foundNames.add(m[1].trim());
-    }
-    for (const name of foundNames) {
-      courses.push({
-        name,
-        scheduleText: '1-16周 周一 第1-2节',
-      });
-    }
   }
 
   return { semesters, courses };
