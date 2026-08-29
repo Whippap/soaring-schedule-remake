@@ -70,7 +70,7 @@ const animatedOverlay = useAnimatedStyle(() => ({ opacity: overlayOpacity.value 
 ### 2. 「跳转到周视图」按钮
 
 - footer 改为双按钮行：「关闭」（左侧，次要文本按钮，沿用现有样式）+「跳转到周视图」（右侧，primary 胶囊按钮，样式参考「今天」按钮：primary 背景 + onPrimary 文字 + 圆角 pill）
-- 点击流程：先走淡出关闭弹窗（复用 `hideSheet`），再调用新 prop `onJumpToWeek(selectedDay.date)`
+- 点击流程：直接调用 `onJumpToWeek(selectedDay.date)`（视图立即切换，CalendarView 整体卸载，无需等待淡出完成——不调用 `hideSheet`）
 - 新 prop：`CalendarView` 增加 `onJumpToWeek: (date: Date) => void`（必传）
 
 ### 3. 跳转数据流（app/index.tsx）
@@ -116,7 +116,7 @@ const handleJumpToWeek = (date: Date) => {
 | 3 天模式下跳转 | 自动切到 7 天模式，目标日所在周完整显示 |
 | 跳转目标日 = 今天所在周 | offset = 0，「返回本周」按钮不出现（weekOffset === 0） |
 | 弹窗打开时快速重复点击日期 | 被 scrim 遮挡，无法触发（现状不变） |
-| 点击「跳转」后 | 弹窗淡出并卸载；视图切换到周视图 |
+| 点击「跳转」后 | 视图立即切换到周视图（CalendarView 卸载，弹窗随视图切换消失） |
 
 ## 范围外
 
