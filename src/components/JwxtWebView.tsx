@@ -91,9 +91,13 @@ const EXTRACT_DATA_SCRIPT = `
 
         var scheduleText = '';
         var location = '';
+        var noSchedule = false;
         var tds = tr.querySelectorAll('td');
         for (var m = 0; m < tds.length; m++) {
           var tdText = (tds[m].textContent || '').replace(/\\s+/g, ' ').trim();
+          if (tdText === '不排课') {
+            noSchedule = true;
+          }
           if (tdText.indexOf('第') >= 0 && (tdText.indexOf('节') >= 0 || tdText.indexOf('周') >= 0)) {
             scheduleText = tdText;
           }
@@ -102,7 +106,7 @@ const EXTRACT_DATA_SCRIPT = `
           }
         }
 
-        if (!scheduleText) {
+        if (!scheduleText && !noSchedule) {
           var allTds = [];
           for (var n = 0; n < tds.length; n++) {
             allTds.push((tds[n].textContent || '').trim());
@@ -122,22 +126,6 @@ const EXTRACT_DATA_SCRIPT = `
           location: location || undefined,
           dataSemester: currentDataSemester
         });
-      }
-
-      if (courses.length === 0) {
-        var h3Regex = /<h3[^>]*>([^<]+)<\\/h3>/g;
-        var showSchedRegex = /class=["'][^"']*showSchedules[^"']*["'][^>]*>([^<]+)/g;
-        var found = {};
-        var match;
-        while ((match = h3Regex.exec(targetDoc.body.innerHTML)) !== null) {
-          if (match[1].trim().length >= 2) found[match[1].trim()] = true;
-        }
-        while ((match = showSchedRegex.exec(targetDoc.body.innerHTML)) !== null) {
-          if (match[1].trim().length >= 2) found[match[1].trim()] = true;
-        }
-        for (var fname in found) {
-          courses.push({ name: fname, scheduleText: '1-16周 周一 第1-2节' });
-        }
       }
 
       var result = JSON.stringify({ semesters: semesters, courses: courses });
