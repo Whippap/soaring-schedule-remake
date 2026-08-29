@@ -71,6 +71,30 @@ async function main() {
     [{ weekRange: '1-14', repeatRule: '', dayOfWeek: 1, classSections: [7, 8] }],
   );
 
+  console.log('== isUnscheduledCourse / convertToCourses / enhanceExtractedData ==');
+  const { isUnscheduledCourse, convertToCourses, enhanceExtractedData } = await import('@/utils/jwxtParser');
+  check('空 scheduleText 判定为不排课', isUnscheduledCourse({ name: 'x', scheduleText: '' }), true);
+  check('不排课拼接文本判定为不排课', isUnscheduledCourse({ name: 'x', scheduleText: '不排课 备注：' }), true);
+  check(
+    '正常课表文本判定为排课',
+    isUnscheduledCourse({ name: 'x', scheduleText: '1-14周 周一 第七节~第八节' }),
+    false,
+  );
+  const converted = convertToCourses(
+    [
+      { name: '科研训练与学科竞赛', code: 'U05P61001', scheduleText: '' },
+      { name: '机械设计Ⅰ', code: 'U05M11010', scheduleText: '1-14周 周一 第七节~第八节' },
+    ],
+    'sem1',
+  );
+  check('convertToCourses 跳过不排课课程', converted.length, 1);
+  check('convertToCourses 保留排课课程', converted[0]?.name, '机械设计Ⅰ');
+  const enhanced = enhanceExtractedData({
+    semesters: [],
+    courses: [{ name: '科研训练与学科竞赛', scheduleText: '' }],
+  });
+  check('enhanceExtractedData 保留不排课课程供 UI 展示', enhanced.courses.length, 1);
+
   console.log('== parseJwxtHtml ==');
   const bupaike = parseJwxtHtml(BUPOIKE_HTML);
   check('不排课行课程数', bupaike.courses.length, 1);

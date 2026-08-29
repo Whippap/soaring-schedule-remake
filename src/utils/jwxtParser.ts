@@ -195,6 +195,10 @@ export function parseScheduleText(scheduleText: string): TimeSlot[] {
   return mergeSlots(slots);
 }
 
+export function isUnscheduledCourse(raw: RawCourse): boolean {
+  return parseScheduleText(raw.scheduleText).length === 0;
+}
+
 function findDayPosition(text: string): number {
   let pos = -1;
   for (const keyword of Object.keys(DAY_MAP)) {
@@ -346,10 +350,11 @@ export function convertToCourses(
   let colorIndex = 0;
 
   for (const raw of filtered) {
-    const timeSlots = parseScheduleText(raw.scheduleText);
-    if (timeSlots.length === 0) {
+    if (isUnscheduledCourse(raw)) {
       continue;
     }
+
+    const timeSlots = parseScheduleText(raw.scheduleText);
 
     let assessmentMethod: AssessmentMethod | undefined;
     if (raw.assessmentMethod) {
