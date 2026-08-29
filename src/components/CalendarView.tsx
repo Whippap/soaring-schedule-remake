@@ -36,6 +36,7 @@ const DAY_NAMES_SHORT = ['一', '二', '三', '四', '五', '六', '日'];
 interface Props {
   courses: Course[];
   semesters: Semester[];
+  onJumpToWeek: (date: Date) => void;
 }
 
 interface DayCourses {
@@ -44,7 +45,7 @@ interface DayCourses {
   count: number;
 }
 
-export const CalendarView = memo(function CalendarView({ courses, semesters }: Props) {
+export const CalendarView = memo(function CalendarView({ courses, semesters, onJumpToWeek }: Props) {
   const dt = useDesignTokens();
   const reduced = useReducedMotion();
   const [cursor, setCursor] = useState(new Date());
@@ -285,6 +286,15 @@ export const CalendarView = memo(function CalendarView({ courses, semesters }: P
                   关闭
                 </Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => onJumpToWeek(selectedDay.date)}
+                style={[styles.jumpBtn, { backgroundColor: dt.colors.primary, borderRadius: dt.borderRadius.pill }]}
+                activeOpacity={0.7}
+              >
+                <Text style={{ color: dt.colors.onPrimary, fontSize: dt.fontSize.body, fontWeight: dt.fontWeight.subheading }}>
+                  跳转到周视图
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </Animated.View>
@@ -392,10 +402,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   sheetFooter: {
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  jumpBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   sheetCloseBtn: {
     paddingHorizontal: 12,

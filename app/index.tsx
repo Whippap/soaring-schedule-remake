@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { FAB, Text } from 'react-native-paper';
 import { View, TouchableOpacity } from 'react-native';
+import { startOfWeek, differenceInCalendarDays } from 'date-fns';
 import type { Course } from '@/types';
 import { createDefaultSemester } from '@/types';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -35,6 +36,15 @@ export default function HomeScreen() {
     setTimeout(() => setCourseFormVisible(true), 0);
   }, []);
 
+  const handleJumpToWeek = useCallback((date: Date) => {
+    const targetWeekStart = startOfWeek(date, { weekStartsOn: 1 });
+    const todayWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const offset = differenceInCalendarDays(targetWeekStart, todayWeekStart) / 7;
+    setWeekOffset(offset);
+    setDayMode(7);
+    setView('schedule');
+  }, []);
+
   const handleCourseFormDismiss = useCallback(() => {
     setCourseFormVisible(false);
   }, []);
@@ -56,7 +66,7 @@ export default function HomeScreen() {
           onEdit={handleEdit}
         />
       ) : (
-        <CalendarView courses={courses} semesters={effectiveSemesters} />
+        <CalendarView courses={courses} semesters={effectiveSemesters} onJumpToWeek={handleJumpToWeek} />
       )}
 
       {/* View Toggle */}
