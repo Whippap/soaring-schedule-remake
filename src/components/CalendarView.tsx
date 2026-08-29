@@ -4,7 +4,7 @@ import { Text } from 'react-native-paper';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  withTiming,
   runOnJS,
 } from 'react-native-reanimated';
 import {
@@ -50,7 +50,8 @@ export const CalendarView = memo(function CalendarView({ courses, semesters }: P
   const [cursor, setCursor] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<DayCourses | null>(null);
 
-  const sheetTranslateY = useSharedValue(400);
+  // 纯淡入淡出：overlay 容器整体 opacity（scrim + 卡片一起）
+  const overlayOpacity = useSharedValue(0);
 
   const days = useMemo(() => {
     const monthStart = startOfMonth(cursor);
@@ -61,25 +62,21 @@ export const CalendarView = memo(function CalendarView({ courses, semesters }: P
   }, [cursor]);
 
   const showSheet = useCallback(() => {
-    sheetTranslateY.value = reduced ? 0 : withSpring(0, { damping: 20, stiffness: 150 });
-  }, [sheetTranslateY, reduced]);
+    overlayOpacity.value = reduced ? 1 : withTiming(1, { duration: 150 });
+  }, [overlayOpacity, reduced]);
 
   const hideSheet = useCallback(() => {
-    const target = 400;
     if (reduced) {
-      sheetTranslateY.value = target;
+      overlayOpacity.value = 0;
       runOnJS(setSelectedDay)(null);
       return;
     }
-     
-    sheetTranslateY.value = withSpring(target, { damping: 20, stiffness: 150 }, () => {
+    overlayOpacity.value = withTiming(0, { duration: 150 }, () => {
       runOnJS(setSelectedDay)(null);
     });
-  }, [sheetTranslateY, reduced]);
+  }, [overlayOpacity, reduced]);
 
-  const animatedSheet = useAnimatedStyle(() => ({
-    transform: [{ translateY: sheetTranslateY.value }],
-  }));
+  const animatedOverlay = useAnimatedStyle(() => ({ opacity: overlayOpacity.value }));
 
   // 预计算每天课程映射，避免 per-day O(courses × slots) 重复计算
   const coursesByDay = useMemo(() => {
@@ -230,24 +227,19 @@ export const CalendarView = memo(function CalendarView({ courses, semesters }: P
         })}
       </View>
 
-      {/* Bottom Sheet */}
+      {/* Day Dialog — 屏幕居中，仅淡入淡出 */}
       {selectedDay ? (
-        <View style={styles.sheetOverlay}>
+        <Animated.View style={[styles.sheetOverlay, animatedOverlay]}>
           <Pressable style={[styles.sheetScrim, { backgroundColor: dt.colors.overlay }]} onPress={hideSheet} />
-          <Animated.View
+          <View
             style={[
-              styles.bottomSheet,
+              styles.dayDialog,
               {
                 backgroundColor: dt.colors.surface,
-                borderTopLeftRadius: dt.borderRadius.xl,
-                borderTopRightRadius: dt.borderRadius.xl,
+                borderRadius: dt.borderRadius.xl,
               },
-              animatedSheet,
             ]}
           >
-            <View style={styles.sheetHandle}>
-              <View style={[styles.handleBar, { backgroundColor: dt.colors.border }]} />
-            </View>
             <Text
               style={{
                 fontSize: dt.fontSize.subheading,
@@ -294,8 +286,8 @@ export const CalendarView = memo(function CalendarView({ courses, semesters }: P
                 </Text>
               </TouchableOpacity>
             </View>
-          </Animated.View>
-        </View>
+          </View>
+        </Animated.View>
       ) : null}
     </View>
   );
@@ -373,24 +365,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
   sheetScrim: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     // backgroundColor set inline via dt.colors.overlay
   },
-  bottomSheet: {
+  dayDialog: {
+    marginHorizontal: 24,
     maxHeight: '60%',
     overflow: 'hidden',
-  },
-  sheetHandle: {
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  handleBar: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
   },
   sheetBody: {
     paddingHorizontal: 20,
