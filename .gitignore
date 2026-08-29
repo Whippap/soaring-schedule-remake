@@ -54,3 +54,6 @@ document/
 .vscode/
 # SDD temp ledger
 .superpowers/
+
+.idea/
+docs/
