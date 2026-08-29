@@ -152,7 +152,7 @@ function rangeArray(start: number, end: number): number[] {
 
 export function parseScheduleText(scheduleText: string): TimeSlot[] {
   if (!scheduleText) {
-    return [{ weekRange: '1-16', repeatRule: RepeatRule.ALL, dayOfWeek: 1, classSections: [1] }];
+    return [];
   }
 
   const cleaned = scheduleText
@@ -190,10 +190,6 @@ export function parseScheduleText(scheduleText: string): TimeSlot[] {
     for (const wr of weekRanges) {
       slots.push({ weekRange: wr, repeatRule, dayOfWeek, classSections });
     }
-  }
-
-  if (slots.length === 0) {
-    return [{ weekRange: '1-16', repeatRule: RepeatRule.ALL, dayOfWeek: 1, classSections: [1] }];
   }
 
   return mergeSlots(slots);
