@@ -1,9 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { View, Alert, TouchableOpacity } from 'react-native';
-import { Switch, Text } from 'react-native-paper';
+import { Switch, SegmentedButtons, Text } from 'react-native-paper';
+import * as Notifications from 'expo-notifications';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CourseImportWizard } from '@/components/CourseImportWizard';
 import { exportData, importData } from '@/utils/dataBackup';
+import { REMINDER_LEAD_OPTIONS } from '@/utils/reminderScheduler';
 import { PRESET_COLORS } from '@/types';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
@@ -17,9 +19,37 @@ export default function SettingsScreen() {
   const setDarkMode = useSettingsStore((s) => s.setDarkMode);
   const themeColor = useSettingsStore((s) => s.themeColor);
   const setThemeColor = useSettingsStore((s) => s.setThemeColor);
+  const reminderEnabled = useSettingsStore((s) => s.reminderEnabled);
+  const setReminderEnabled = useSettingsStore((s) => s.setReminderEnabled);
+  const reminderLeadMinutes = useSettingsStore((s) => s.reminderLeadMinutes);
+  const setReminderLeadMinutes = useSettingsStore((s) => s.setReminderLeadMinutes);
   const formatData = useSettingsStore((s) => s.formatData);
   const [importVisible, setImportVisible] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [permissionDenied, setPermissionDenied] = useState(false);
+
+  useEffect(() => {
+    Notifications.getPermissionsAsync().then((p) => setPermissionDenied(!p.granted));
+  }, []);
+
+  const handleReminderToggle = useCallback(
+    async (value: boolean) => {
+      if (!value) {
+        setReminderEnabled(false);
+        return;
+      }
+      const perms = await Notifications.getPermissionsAsync();
+      const granted = perms.granted || (await Notifications.requestPermissionsAsync()).granted;
+      if (!granted) {
+        setPermissionDenied(true);
+        showSnackbar('未授予通知权限,无法开启上课提醒');
+        return;
+      }
+      setPermissionDenied(false);
+      setReminderEnabled(true);
+    },
+    [setReminderEnabled, showSnackbar],
+  );
 
   const handleExport = useCallback(async () => {
     setBusy(true);
@@ -141,6 +171,49 @@ export default function SettingsScreen() {
             ))}
           </View>
         </View>
+      </View>
+
+      {/* Reminder Card */}
+      <View style={cardStyle}>
+        <Text style={{
+          fontSize: dt.fontSize.label,
+          fontWeight: dt.fontWeight.subheading,
+          color: dt.colors.textMuted,
+          textTransform: 'uppercase',
+          letterSpacing: 1,
+          marginBottom: 12,
+        }}>
+          上课提醒
+        </Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Icon name="alert" size={20} color={dt.colors.textSecondary} />
+            <Text style={{ fontSize: dt.fontSize.body, color: dt.colors.text, marginLeft: 12 }}>
+              开启提醒
+            </Text>
+          </View>
+          <Switch value={reminderEnabled} onValueChange={handleReminderToggle} color={dt.colors.primary} />
+        </View>
+        {reminderEnabled ? (
+          <View style={{ marginTop: 12 }}>
+            <Text style={{ fontSize: dt.fontSize.caption, color: dt.colors.textSecondary, marginBottom: 8 }}>
+              提前多久提醒
+            </Text>
+            <SegmentedButtons
+              value={String(reminderLeadMinutes)}
+              onValueChange={(v) => setReminderLeadMinutes(Number(v))}
+              buttons={REMINDER_LEAD_OPTIONS.map((m) => ({ value: String(m), label: `${m} 分钟` }))}
+            />
+          </View>
+        ) : null}
+        {permissionDenied ? (
+          <Text style={{ fontSize: dt.fontSize.caption, color: dt.colors.destructive, marginTop: 12 }}>
+            通知权限已关闭,无法发送提醒,请在系统设置中开启
+          </Text>
+        ) : null}
+        <Text style={{ fontSize: dt.fontSize.caption, color: dt.colors.textMuted, marginTop: 12 }}>
+          在课程开始前发送通知提醒您上课,如果还是害怕错过课程的话,就去定个闹钟吧~
+        </Text>
       </View>
 
       {/* Data Card */}
