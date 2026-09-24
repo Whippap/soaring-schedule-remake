@@ -6,6 +6,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { CourseImportWizard } from '@/components/CourseImportWizard';
 import { exportData, importData } from '@/utils/dataBackup';
 import { REMINDER_LEAD_OPTIONS } from '@/utils/reminderScheduler';
+import { sendTestReminderNotification } from '@/utils/reminderNotifications';
 import { PRESET_COLORS } from '@/types';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { useDesignTokens } from '@/hooks/useDesignTokens';
@@ -50,6 +51,20 @@ export default function SettingsScreen() {
     },
     [setReminderEnabled, showSnackbar],
   );
+
+  const handleSendTestNotification = useCallback(async () => {
+    const perms = await Notifications.getPermissionsAsync();
+    if (!perms.granted) {
+      showSnackbar('通知权限已关闭,无法发送测试通知');
+      return;
+    }
+    try {
+      await sendTestReminderNotification();
+      showSnackbar('测试通知已发送');
+    } catch {
+      showSnackbar('测试通知发送失败');
+    }
+  }, [showSnackbar]);
 
   const handleExport = useCallback(async () => {
     setBusy(true);
@@ -214,6 +229,14 @@ export default function SettingsScreen() {
         <Text style={{ fontSize: dt.fontSize.caption, color: dt.colors.textMuted, marginTop: 12 }}>
           在课程开始前发送通知提醒您上课,如果还是害怕错过课程的话,就去定个闹钟吧~
         </Text>
+        <View style={{ height: 1, backgroundColor: dt.colors.border, marginVertical: 12 }} />
+        <SettingsRow
+          dt={dt}
+          icon="alert"
+          label="发送测试通知"
+          sub="立即发送一条通知,验证通知与铃声效果"
+          onPress={handleSendTestNotification}
+        />
       </View>
 
       {/* Data Card */}

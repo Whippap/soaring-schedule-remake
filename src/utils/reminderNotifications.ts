@@ -42,3 +42,15 @@ export async function scheduleReminders(occurrences: ReminderOccurrence[]): Prom
 export async function cancelAllReminders(): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
+
+/** 立即发送一条测试通知(trigger 为 null),供设置页验证通知与铃声效果 */
+export async function sendTestReminderNotification(): Promise<void> {
+  await ensureReminderChannel();
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: '上课提醒',
+      body: '这是一条测试通知,上课提醒功能正常~',
+    },
+    trigger: null,
+  });
+}
