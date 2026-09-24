@@ -189,7 +189,7 @@ const endTime = times[lastSec - 1]?.end ?? '';
 ## 范围外
 
 - `TimeTableEditor.tsx` 的死代码清理与预设去重（当前不动，仅在新模块中消除新增重复）
-- Widget 午夜/跨天不刷新问题（现有行为，与本次改动无关）
+- Widget 午夜/跨天不刷新问题（已由后续改动解决：系统 30 分钟周期刷新 + headless 从存储重建快照）
 
 ## 验证
 

@@ -18,7 +18,7 @@
 
 ### Android Widget
 
-支持两种尺寸的桌面小组件，均支持深色/浅色双主题、点击刷新、数据变化自动更新、整点闹钟刷新。
+支持两种尺寸的桌面小组件，均支持深色/浅色双主题、点击刷新、数据变化自动更新、系统 30 分钟周期刷新（后台刷新时按当前日期重建数据，支持跨天自动切换）。
 
 | Widget | 尺寸 | 内容 |
 |--------|------|------|
@@ -137,10 +137,7 @@ widgets/                    Android Widget
 └── widget-task-handler.tsx Widget 生命周期处理
 
 plugins/                    Expo Config Plugins
-├── withHonorWidget.js      荣耀设备 Widget 兼容
-├── withWidgetConfig.js     AlarmManager 整点刷新注入
-└── templates/
-    └── WidgetProvider.java  AlarmManager 实现模板
+└── withHonorWidget.js      荣耀设备 Widget 兼容（exported receiver）
 ```
 
 ---
@@ -165,15 +162,14 @@ plugins/                    Expo Config Plugins
 AsyncStorage
   ├── courseStore      → "soaring-schedule-courses"
   ├── settingsStore    → "soaring-schedule-settings"
-  ├── widget data      → "@soaring_schedule:widget_data"
-  └── widget dark mode → "@soaring_schedule:dark_mode"
+  └── widget data      → "@soaring_schedule:widget_data"
 
 settingsStore ──deleteSemester()────→ courseStore.deleteCoursesBySemester()
 settingsStore ──updateSemester()────→ courseStore.adjustCoursesForSemester()（周/节缩减时裁剪）
 settingsStore ──formatData()────────→ courseStore.clearAllCourses()
 ```
 
-两个 Zustand store，**单向耦合**（settingsStore → courseStore，不可反向）。Widget 数据独立于 App 的 darkMode 设置，使用单独的 AsyncStorage key。
+两个 Zustand store，**单向耦合**（settingsStore → courseStore，不可反向）。Widget 深浅色由系统夜间模式自动选择（`renderWidget` 同时提供 light/dark 两套渲染）。
 
 ---
 
