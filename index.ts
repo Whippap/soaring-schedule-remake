@@ -7,5 +7,8 @@ import '@expo/metro-runtime';
 import { App } from 'expo-router/build/qualified-entry';
 import { renderRootComponent } from 'expo-router/build/renderRootComponent';
 import '@/widgets/widget-task-handler';
+import { configureReminderHandler } from '@/utils/reminderNotifications';
+
+configureReminderHandler();
 
 renderRootComponent(App);
