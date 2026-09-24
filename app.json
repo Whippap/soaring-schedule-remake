@@ -9,6 +9,11 @@
     "userInterfaceStyle": "automatic",
     "android": {
       "package": "com.nwpu.soaringschedule",
+      "permissions": [
+        "POST_NOTIFICATIONS",
+        "SCHEDULE_EXACT_ALARM",
+        "USE_EXACT_ALARM"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
         "backgroundColor": "#607d8b",
@@ -65,7 +70,8 @@
           ]
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,
