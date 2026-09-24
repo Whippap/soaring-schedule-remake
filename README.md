@@ -14,7 +14,7 @@
 |-----|------|
 | **课表** | 周视图网格（7 天 / 3 天切换），课程块跨课节合并，点击详情弹窗（含编辑入口），月历视图，周切换 / 返回本周 |
 | **课表管理** | 学期 CRUD，课程 CRUD（多时间段、周范围选择、课节选择器、8 色预设、冲突检测），按教室分组合并地点展示 |
-| **设置** | 教务系统一键导入（NWPU WebView 自动抓取）、深色模式 / 主题色切换、数据导出 / 导入（JSON + 版本号）、格式化重置 |
+| **设置** | 教务系统一键导入（NWPU WebView 自动抓取）、深色模式 / 主题色切换、上课提醒（开关 + 提前档位 + 本地精确通知）、数据导出 / 导入（JSON + 版本号）、格式化重置 |
 
 ### Android Widget
 
@@ -34,7 +34,7 @@
 ```
 React Native 0.86    Expo SDK 57         TypeScript 6.0 (strict)
 Zustand 5            AsyncStorage 2      date-fns 4
-React Native Paper 5 react-native-webview react-native-android-widget
+React Native Paper 5 react-native-webview react-native-android-widget expo-notifications
 React Compiler       Expo Router 4       React Native Reanimated 4
 ```
 
