@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useWidgetDataSync } from '@/hooks/useWidgetDataSync';
+import { useReminderSync } from '@/hooks/useReminderSync';
 import { useAppHydrated } from '@/hooks/useAppHydrated';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Icon } from '@/components/Icon';
@@ -15,6 +16,7 @@ export default function RootLayout() {
   const themeColor = useSettingsStore((s) => s.themeColor);
   const appHydrated = useAppHydrated();
   useWidgetDataSync(appHydrated);
+  useReminderSync(appHydrated);
 
   useEffect(() => {
     if (!appHydrated) return;
