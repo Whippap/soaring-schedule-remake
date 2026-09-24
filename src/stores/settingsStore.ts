@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { migrateSemesters } from '@/utils/campusTimes';
+import { DEFAULT_REMINDER_LEAD_MINUTES } from '@/utils/reminderScheduler';
 import { DEFAULT_THEME_COLOR, type Semester } from '@/types';
 import { useCourseStore } from './courseStore';
 
@@ -10,12 +11,16 @@ interface SettingsState {
   semesters: Semester[];
   themeColor: string;
   darkMode: boolean;
+  reminderEnabled: boolean;
+  reminderLeadMinutes: number;
   setHydrated: (hydrated: boolean) => void;
   addSemester: (semester: Semester) => void;
   updateSemester: (id: string, updates: Partial<Semester>) => void;
   deleteSemester: (id: string) => void;
   setThemeColor: (color: string) => void;
   setDarkMode: (enabled: boolean) => void;
+  setReminderEnabled: (enabled: boolean) => void;
+  setReminderLeadMinutes: (minutes: number) => void;
   formatData: () => void;
   isSemesterOverlap: (semester: Omit<Semester, 'id'>, excludeId?: string) => boolean;
 }
@@ -36,6 +41,8 @@ export const useSettingsStore = create<SettingsState>()(
       semesters: [],
       themeColor: DEFAULT_THEME_COLOR,
       darkMode: false,
+      reminderEnabled: false,
+      reminderLeadMinutes: DEFAULT_REMINDER_LEAD_MINUTES,
       setHydrated: (hydrated) => set({ hydrated }),
       addSemester: (semester) => set((s) => ({ semesters: [...s.semesters, semester] })),
       updateSemester: (id, updates) => {
@@ -57,9 +64,17 @@ export const useSettingsStore = create<SettingsState>()(
       },
       setThemeColor: (color) => set({ themeColor: color }),
       setDarkMode: (enabled) => set({ darkMode: enabled }),
+      setReminderEnabled: (enabled) => set({ reminderEnabled: enabled }),
+      setReminderLeadMinutes: (minutes) => set({ reminderLeadMinutes: minutes }),
       formatData: () => {
         useCourseStore.getState().clearAllCourses();
-        set({ semesters: [], themeColor: DEFAULT_THEME_COLOR, darkMode: false });
+        set({
+          semesters: [],
+          themeColor: DEFAULT_THEME_COLOR,
+          darkMode: false,
+          reminderEnabled: false,
+          reminderLeadMinutes: DEFAULT_REMINDER_LEAD_MINUTES,
+        });
       },
       isSemesterOverlap: (semester, excludeId) =>
         get().semesters.some(
@@ -75,6 +90,8 @@ export const useSettingsStore = create<SettingsState>()(
         semesters: state.semesters,
         themeColor: state.themeColor,
         darkMode: state.darkMode,
+        reminderEnabled: state.reminderEnabled,
+        reminderLeadMinutes: state.reminderLeadMinutes,
       }),
       onRehydrateStorage: () => (state) => {
         if (state && Array.isArray(state.semesters)) {
