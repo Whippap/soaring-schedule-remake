@@ -1,11 +1,15 @@
 import { useState, useCallback, useEffect } from 'react';
 import { View, Alert, TouchableOpacity } from 'react-native';
-import { Switch, SegmentedButtons, Text } from 'react-native-paper';
+import { Switch, Text } from 'react-native-paper';
 import * as Notifications from 'expo-notifications';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CourseImportWizard } from '@/components/CourseImportWizard';
+import { PickerField } from '@/components/PickerField';
 import { exportData, importData } from '@/utils/dataBackup';
-import { REMINDER_LEAD_OPTIONS } from '@/utils/reminderScheduler';
+import {
+  REMINDER_LEAD_OPTIONS,
+  formatReminderLeadMinutes,
+} from '@/utils/reminderScheduler';
 import { sendTestReminderNotification } from '@/utils/reminderNotifications';
 import { PRESET_COLORS } from '@/types';
 import { ScreenContainer } from '@/components/ScreenContainer';
@@ -211,13 +215,13 @@ export default function SettingsScreen() {
         </View>
         {reminderEnabled ? (
           <View style={{ marginTop: 12 }}>
-            <Text style={{ fontSize: dt.fontSize.caption, color: dt.colors.textSecondary, marginBottom: 8 }}>
-              提前多久提醒
-            </Text>
-            <SegmentedButtons
-              value={String(reminderLeadMinutes)}
-              onValueChange={(v) => setReminderLeadMinutes(Number(v))}
-              buttons={REMINDER_LEAD_OPTIONS.map((m) => ({ value: String(m), label: `${m} 分钟` }))}
+            <PickerField
+              label="提前多久提醒"
+              value={reminderLeadMinutes}
+              options={[...REMINDER_LEAD_OPTIONS]}
+              displayValue={formatReminderLeadMinutes}
+              onSelect={setReminderLeadMinutes}
+              dt={dt}
             />
           </View>
         ) : null}

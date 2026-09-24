@@ -5,6 +5,7 @@
 import {
   computeReminderOccurrences,
   formatReminderBody,
+  formatReminderLeadMinutes,
   MAX_REMINDERS,
 } from '@/utils/reminderScheduler';
 import { AssessmentMethod, RepeatRule, type Course, type Semester } from '@/types';
@@ -123,7 +124,14 @@ void (async () => {
     0,
   );
 
-  // 8. 上限保护常量
+  // 8. 提前 60 分钟档:08:00 课 → 07:00 触发;标签格式
+  const lead60 = computeReminderOccurrences([friday], [semester], 60, NOW);
+  check('lead-60-trigger', lead60[0]!.triggerDate.toISOString(), new Date(2026, 8, 25, 7, 0).toISOString());
+  check('lead-label-10', formatReminderLeadMinutes(10), '10 分钟');
+  check('lead-label-60', formatReminderLeadMinutes(60), '1 小时');
+  check('lead-label-120', formatReminderLeadMinutes(120), '2 小时');
+
+  // 9. 上限保护常量
   check('max-reminders-constant', MAX_REMINDERS, 400);
 
   if (failures > 0) {

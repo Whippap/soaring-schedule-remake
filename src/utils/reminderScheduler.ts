@@ -10,8 +10,13 @@ import { getSectionTimesForDate } from './campusTimes';
 import { formatLocationForDisplay } from './locationFormat';
 
 export const REMINDER_CHANNEL_ID = 'class-reminders';
-export const REMINDER_LEAD_OPTIONS = [5, 10, 15, 30] as const;
+export const REMINDER_LEAD_OPTIONS = [5, 10, 15, 30, 60, 120] as const;
 export const DEFAULT_REMINDER_LEAD_MINUTES = 10;
+
+/** 档位显示文案:不满 1 小时显示「N 分钟」,整小时显示「N 小时」 */
+export function formatReminderLeadMinutes(minutes: number): string {
+  return minutes >= 60 ? `${minutes / 60} 小时` : `${minutes} 分钟`;
+}
 /** Android 闹钟上限 500,留余量 */
 export const MAX_REMINDERS = 400;
 /** 为覆盖学期切换,对「今天起 90 天内开始」的未来学期也排程 */
