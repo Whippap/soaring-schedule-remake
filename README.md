@@ -134,7 +134,9 @@ src/
 
 widgets/                    Android Widget
 ├── CourseWidget.tsx        桌面小组件渲染（大/小两种变体）
-└── widget-task-handler.tsx Widget 生命周期处理
+└── widget-task-handler.tsx Widget 生命周期处理（在 bundle 入口 index.ts 注册，headless 冷启动必须）
+
+index.ts                    bundle 入口（package.json main）：注册 widget handler 后进入 expo-router
 
 plugins/                    Expo Config Plugins
 └── withHonorWidget.js      荣耀设备 Widget 兼容（exported receiver）

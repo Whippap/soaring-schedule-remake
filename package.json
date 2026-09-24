@@ -1,6 +1,6 @@
 {
   "name": "soaring-schedule",
-  "main": "expo-router/entry",
+  "main": "index.ts",
   "version": "1.0.1",
   "private": true,
   "scripts": {
