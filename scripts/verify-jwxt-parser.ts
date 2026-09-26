@@ -66,6 +66,7 @@ async function main() {
     isUnscheduledCourse,
     convertToCourses,
     enhanceExtractedData,
+    stripGraduatePrefix,
   } = await import('@/utils/jwxtParser');
 
   console.log('== parseScheduleText ==');
@@ -99,6 +100,17 @@ async function main() {
     courses: [{ name: '科研训练与学科竞赛', scheduleText: '' }],
   });
   check('enhanceExtractedData 保留不排课课程供 UI 展示', enhanced.courses.length, 1);
+
+  console.log('== stripGraduatePrefix ==');
+  check('研究生前缀剥离', stripGraduatePrefix('研究生矩阵论'), '矩阵论');
+  check('双重前缀只剥一个', stripGraduatePrefix('研究生研究生科技英语'), '研究生科技英语');
+  check('无前缀原样返回', stripGraduatePrefix('机械设计Ⅰ'), '机械设计Ⅰ');
+  check('整名即前缀剥离为空', stripGraduatePrefix('研究生'), '');
+  const enhancedGrad = enhanceExtractedData({
+    semesters: [],
+    courses: [{ name: '研究生矩阵论', scheduleText: '1-14周 周一 第七节~第八节' }],
+  });
+  check('enhanceExtractedData 剥离研究生前缀', enhancedGrad.courses[0]?.name, '矩阵论');
 
   console.log('== parseJwxtHtml ==');
   const bupaike = parseJwxtHtml(BUPOIKE_HTML);

@@ -305,6 +305,12 @@ function parseWeeksToList(weekRange: string): number[] {
   return weeks;
 }
 
+const GRADUATE_PREFIX = '研究生';
+
+export function stripGraduatePrefix(name: string): string {
+  return name.startsWith(GRADUATE_PREFIX) ? name.slice(GRADUATE_PREFIX.length) : name;
+}
+
 export function enhanceExtractedData(rawData: ParsedData): ParsedData {
   const enhanced: RawCourse[] = [];
   for (const course of rawData.courses) {
@@ -332,7 +338,7 @@ export function enhanceExtractedData(rawData: ParsedData): ParsedData {
       }
     }
 
-    enhanced.push({ ...course, location, teacher });
+    enhanced.push({ ...course, name: stripGraduatePrefix(course.name), location, teacher });
   }
   return { semesters: rawData.semesters, courses: enhanced };
 }
